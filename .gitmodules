@@ -1,0 +1,3 @@
+[submodule "builtils"]
+	path = builtils
+	url = git@github.com:rbkmoney/build_utils.git
