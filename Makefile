@@ -6,7 +6,7 @@ UTILS_PATH := builtils
 TEMPLATES_PATH := .
 
 # Name of the service
-SERVICE_NAME := dmt_client
+SERVICE_NAME := party_client
 
 # Build image tag to be used
 BUILD_IMAGE_TAG := 9d4d70317dd08abd400798932a231798ee254a87
