@@ -41,6 +41,7 @@ build('dmt_client', 'docker-host', finalHook) {
       }
     }
     runStage('test') {
+      sh "make wc_get_test_deps"
       sh "make wdeps_test"
     }
   }
