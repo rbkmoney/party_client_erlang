@@ -2,8 +2,10 @@
 
 -export([create/1]).
 -export([get_woody_context/1]).
+-export([set_woody_context/2]).
 -export([get_user_info/1]).
 -export([get_user_info/2]).
+-export([set_user_info/2]).
 
 -opaque context() :: #{
     woody_context := woody_context(),
@@ -34,6 +36,10 @@ get_woody_context(Context) ->
     #{woody_context := WoodyContext} = ensure_user_info_set(Context),
     WoodyContext.
 
+-spec set_woody_context(woody_context(), context()) -> context().
+set_woody_context(WoodyContext, Context) ->
+    Context#{woody_context := WoodyContext}.
+
 -spec get_user_info(context()) -> user_info() | undefined.
 get_user_info(Context) ->
     get_user_info(Context, undefined).
@@ -43,6 +49,10 @@ get_user_info(#{user_info := UserInfo}, _Default) ->
     UserInfo;
 get_user_info(#{woody_context := WoodyContext}, Default) ->
     get_woody_user_info(WoodyContext, Default).
+
+-spec set_user_info(user_info(), context()) -> context().
+set_user_info(UserInfo, Context) ->
+    Context#{user_info := UserInfo}.
 
 %% Internal functions
 
