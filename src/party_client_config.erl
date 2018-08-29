@@ -102,8 +102,8 @@ get_nested_map([Key | Path], Map, Default) ->
     NextMap = maps:get(Key, Map, Default),
     get_nested_map(Path, NextMap, Default).
 
-merge_nested_maps(Map, #{}) ->
-    Map;
+merge_nested_maps(Map1, Map2) when map_size(Map2) =:= 0 ->
+    Map1;
 merge_nested_maps(Map1, Map2) ->
     maps:fold(fun merge_map_item/3, Map1, Map2).
 
