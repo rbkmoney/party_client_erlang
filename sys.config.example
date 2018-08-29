@@ -1,0 +1,18 @@
+[
+    {party_client, [
+        % {services, #{
+        %     party_management => "http://hellgate:8022/v1/processing/partymgmt"
+        % }},
+        % {woody, #{
+        %     event_handler => woody_event_handler_default,
+        %     transport_opts => [],
+        %     party_service => {dmsl_payment_processing_thrift, 'PartyManagement'},
+        %     workers_name => party_client_default_workers,
+        %     cache_options => #{
+        %         local_name => party_client_default_cache
+        %     },
+        %     cache_mode => safe,  % disabled | safe | aggressive
+        %     aggressive_caching_timeout => 30000
+        % }}
+    ]}
+].
