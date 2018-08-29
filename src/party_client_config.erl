@@ -7,18 +7,20 @@
 -export([get_cache_mode/1]).
 -export([get_aggressive_caching_timeout/1]).
 -export([get_woody_event_handler/1]).
+-export([get_woody_transport_opts/1]).
 -export([get_woody_options/1]).
 -export([get_workers_name/1]).
 
 -opaque client() :: options().
 -type options() :: #{
-    party_root => binary(),
+    party_url => binary(),
     party_service => woody_service(),
     cache_options => cache_options(),
     cache_mode => cache_mode(),
     aggressive_caching_timeout => timeout(),
     workers_name => workers_name(),
-    woody_event_handler => atom()
+    woody_event_handler => atom(),
+    woody_transport_opts => woody_transport_opts()
 }.
 -type cache_mode() :: disabled | safe | aggressive.
 
@@ -39,6 +41,7 @@
 -type workers_name() :: atom().
 -type woody_service() :: woody:service().
 -type woody_options() :: woody_caching_client:options().
+-type woody_transport_opts() :: woody_client_thrift_http_transport:options().
 
 %% API
 
@@ -47,7 +50,7 @@ create(Options) ->
     Options.
 
 -spec get_party_url(client()) -> binary().
-get_party_url(#{party_root := Root}) ->
+get_party_url(#{party_url := Root}) ->
     Root;
 get_party_url(_Client) ->
     get_default([services, party_management]).
@@ -90,14 +93,21 @@ get_woody_event_handler(#{woody_event_handler := WorkersName}) ->
 get_woody_event_handler(_Client) ->
     get_default([woody, event_handler], woody_event_handler_default).
 
+-spec get_woody_transport_opts(client()) -> woody_transport_opts().
+get_woody_transport_opts(#{woody_transport_opts := Opts}) ->
+    Opts;
+get_woody_transport_opts(_Client) ->
+    get_default([woody, transport_opts], []).
+
 -spec get_woody_options(client()) -> woody_options().
 get_woody_options(Client) ->
     #{
         cache        => get_cache_options(Client),
         workers_name => get_workers_name(Client),
         woody_client => #{
-            url           => get_party_url(Client),
-            event_handler => get_woody_event_handler(Client)
+            url            => get_party_url(Client),
+            event_handler  => get_woody_event_handler(Client),
+            transport_opts => get_woody_transport_opts(Client)
         }
     }.
 

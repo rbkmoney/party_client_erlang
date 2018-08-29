@@ -74,11 +74,7 @@ init_per_suite(Config) ->
                 'RepositoryClient' => <<"http://dominant:8022/v1/domain/repository_client">>
             }}
         ]},
-        {party_client, [
-            {services, #{
-                party_management => "http://hellgate:8022/v1/processing/partymgmt"
-            }}
-        ]}
+        {party_client, []}
     ],
     Apps = lists:flatten([genlib_app:start_application_with(A, C) || {A, C} <- AppConfig]),
     {ok, Revision} = init_domain(),

@@ -10,5 +10,10 @@
         scoper,
         woody,
         woody_user_identity
+    ]},
+    {env, [
+        {services, #{
+            party_management => "http://hellgate:8022/v1/processing/partymgmt"
+        }}
     ]}
 ]}.

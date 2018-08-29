@@ -62,20 +62,7 @@ get_safe_cache_control(_Other) ->
 
 -spec get_aggressive_cache_control(atom(), timeout()) -> woody_caching_client:cache_control().
 get_aggressive_cache_control(Function, Timeout) ->
-    CachingFunctions = #{
-        'Checkout' => cache,
-        'Get' => temporary,
-        'GetContract' => temporary,
-        'ComputeContractTerms' => temporary,
-        'GetShop' => temporary,
-        'GetClaim' => temporary,
-        'GetClaims' => temporary,
-        'GetEvents' => temporary,
-        'GetShopAccount' => temporary,
-        'ComputePaymentInstitutionTerms' => temporary,
-        'ComputePayoutCashFlow' => temporary
-    },
-    case maps:get(Function, CachingFunctions, no_cache) of
+    case get_aggressive_function_cache_mode(Function) of
         cache ->
             cache;
         temporary ->
@@ -83,3 +70,16 @@ get_aggressive_cache_control(Function, Timeout) ->
         no_cache ->
             no_cache
     end.
+
+get_aggressive_function_cache_mode('Checkout') -> cache;
+get_aggressive_function_cache_mode('Get' ) -> temporary;
+get_aggressive_function_cache_mode('GetContract') -> temporary;
+get_aggressive_function_cache_mode('ComputeContractTerms') -> temporary;
+get_aggressive_function_cache_mode('GetShop') -> temporary;
+get_aggressive_function_cache_mode('GetClaim') -> temporary;
+get_aggressive_function_cache_mode('GetClaims') -> temporary;
+get_aggressive_function_cache_mode('GetEvents') -> temporary;
+get_aggressive_function_cache_mode('GetShopAccount') -> temporary;
+get_aggressive_function_cache_mode('ComputePaymentInstitutionTerms') -> temporary;
+get_aggressive_function_cache_mode('ComputePayoutCashFlow') -> temporar;
+get_aggressive_function_cache_mode(_Other) -> no_cache.
