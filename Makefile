@@ -1,18 +1,18 @@
 REBAR := $(shell which rebar3 2>/dev/null || which ./rebar3)
-SUBMODULES = builtils
+SUBMODULES = build_utils
 SUBTARGETS = $(patsubst %,%/.git,$(SUBMODULES))
 
-UTILS_PATH := builtils
+UTILS_PATH := build_utils
 TEMPLATES_PATH := .
 
 # Name of the service
-SERVICE_NAME := dmt_client
+SERVICE_NAME := party_client
 
 # Build image tag to be used
 BUILD_IMAGE_TAG := 9d4d70317dd08abd400798932a231798ee254a87
 
 CALL_ANYWHERE := all submodules rebar-update compile xref lint dialyze clean distclean
-CALL_W_CONTAINER := $(CALL_ANYWHERE) test
+CALL_W_CONTAINER := $(CALL_ANYWHERE) test get_test_deps
 
 all: compile
 
@@ -43,6 +43,9 @@ dialyze: submodules
 
 test: submodules
 	$(REBAR) ct
+
+get_test_deps: submodules
+	$(REBAR) as test get-deps
 
 clean:
 	$(REBAR) clean

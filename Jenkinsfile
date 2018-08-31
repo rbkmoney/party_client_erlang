@@ -9,16 +9,12 @@ def finalHook = {
 
 build('dmt_client', 'docker-host', finalHook) {
   checkoutRepo()
-  runStage('load_builtils') {
-    withGithubSshCredentials {
-      sh 'git submodule update --init'
-    }
-  }
+  loadBuildUtils()
 
   def pipeDefault
   def withWsCache
   runStage('load pipeline') {
-    env.JENKINS_LIB = "builtils/jenkins_lib"
+    env.JENKINS_LIB = "build_utils/jenkins_lib"
     pipeDefault = load("${env.JENKINS_LIB}/pipeDefault.groovy")
     withWsCache = load("${env.JENKINS_LIB}/withWsCache.groovy")
   }
@@ -36,11 +32,14 @@ build('dmt_client', 'docker-host', finalHook) {
       sh 'make wc_xref'
     }
     runStage('dialyze') {
-      withWsCache("_build/default/rebar3_19.1_plt") {
+      withWsCache("_build/default/rebar3_19.3_plt") {
         sh 'make wc_dialyze'
       }
     }
     runStage('test') {
+      withGithubPrivkey {
+        sh "make wc_get_test_deps"
+      }
       sh "make wdeps_test"
     }
   }
