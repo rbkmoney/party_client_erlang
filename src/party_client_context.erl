@@ -38,7 +38,7 @@ get_woody_context(Context) ->
 
 -spec set_woody_context(woody_context(), context()) -> context().
 set_woody_context(WoodyContext, Context) ->
-    Context#{woody_context := WoodyContext}.
+    Context#{woody_context => WoodyContext}.
 
 -spec get_user_info(context()) -> user_info() | undefined.
 get_user_info(Context) ->
@@ -52,7 +52,7 @@ get_user_info(#{woody_context := WoodyContext}, Default) ->
 
 -spec set_user_info(user_info(), context()) -> context().
 set_user_info(UserInfo, Context) ->
-    Context#{user_info := UserInfo}.
+    Context#{user_info => UserInfo}.
 
 %% Internal functions
 
@@ -65,7 +65,7 @@ ensure_woody_context_exists(Options) ->
 -spec ensure_user_info_set(context()) -> context().
 ensure_user_info_set(#{user_info := UserInfo, woody_context := WoodyContext} = Context) ->
     NewWoodyContext = woody_user_identity:put(UserInfo, WoodyContext),
-    Context#{woody_context := NewWoodyContext};
+    Context#{woody_context => NewWoodyContext};
 ensure_user_info_set(Context) ->
     Context.
 
