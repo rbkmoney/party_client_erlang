@@ -53,6 +53,9 @@ groups() ->
 
 -spec init_per_suite(config()) -> config().
 init_per_suite(Config) ->
+    % _ = dbg:tracer(),
+    % _ = dbg:p(all, c),
+    % _ = dbg:tpl({'scoper_woody_event_handler', 'handle_event', '_'}, x),
     AppConfig = [
         {lager, [
             {async_threshold, 1},
