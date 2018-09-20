@@ -161,7 +161,12 @@ create(PartyId, PartyParams, Client, Context) ->
 
 -spec get(party_id(), client(), context()) -> result(party()).
 get(PartyId, Client, Context) ->
-    call('Get', [PartyId], Client, Context).
+    case get_revision(PartyId, Client, Context) of
+        {ok, Revision} ->
+            call('Checkout', [PartyId, {revision, Revision}], Client, Context);
+        Error ->
+            Error
+    end.
 
 -spec get_revision(party_id(), client(), context()) -> result(party_revision()).
 get_revision(PartyId, Client, Context) ->
