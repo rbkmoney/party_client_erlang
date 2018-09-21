@@ -4,6 +4,7 @@
 
 -export([create/4]).
 -export([get/3]).
+-export([get_revision/3]).
 -export([checkout/4]).
 -export([block/4]).
 -export([unblock/4]).
@@ -45,6 +46,7 @@
 -type user_info() :: dmsl_payment_processing_thrift:'UserInfo'().
 -type party_id() :: dmsl_domain_thrift:'PartyID'().
 -type party_params() :: dmsl_payment_processing_thrift:'PartyParams'().
+-type party_revision() :: dmsl_domain_thrift:'PartyRevision'().
 -type contract_id() :: dmsl_domain_thrift:'ContractID'().
 -type contract() :: dmsl_domain_thrift:'Contract'().
 -type shop_id() :: dmsl_domain_thrift:'ShopID'().
@@ -76,6 +78,7 @@
 -export_type([user_info/0]).
 -export_type([party_id/0]).
 -export_type([party_params/0]).
+-export_type([party_revision/0]).
 -export_type([contract_id/0]).
 -export_type([contract/0]).
 -export_type([shop_id/0]).
@@ -158,7 +161,16 @@ create(PartyId, PartyParams, Client, Context) ->
 
 -spec get(party_id(), client(), context()) -> result(party()).
 get(PartyId, Client, Context) ->
-    call('Get', [PartyId], Client, Context).
+    case get_revision(PartyId, Client, Context) of
+        {ok, Revision} ->
+            call('Checkout', [PartyId, {revision, Revision}], Client, Context);
+        Error ->
+            Error
+    end.
+
+-spec get_revision(party_id(), client(), context()) -> result(party_revision()).
+get_revision(PartyId, Client, Context) ->
+    call('GetRevision', [PartyId], Client, Context).
 
 -spec checkout(party_id(), party_revision_param(), client(), context()) ->
     result(party(), invalid_party_revision()).

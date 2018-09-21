@@ -21,6 +21,7 @@
 -export([shop_create_and_get_test/1]).
 -export([shop_operations_test/1]).
 -export([claim_operations_test/1]).
+-export([get_revision_test/1]).
 
 %% Internal types
 
@@ -47,7 +48,8 @@ groups() ->
             contract_create_and_get_test,
             shop_create_and_get_test,
             shop_operations_test,
-            claim_operations_test
+            claim_operations_test,
+            get_revision_test
         ]}
     ].
 
@@ -222,6 +224,34 @@ claim_operations_test(C) ->
     {error, #payproc_InvalidClaimStatus{}} =
         party_client_thrift:revoke_claim(PartyId, NewClaimId, NewRevision2, <<"revoke_test">>, Client, Context),
     {ok, [ContractClaim, _NewClaim]} = party_client_thrift:get_claims(PartyId, Client, Context).
+
+-spec get_revision_test(config()) -> any().
+get_revision_test(C) ->
+    {ok, PartyId, Client, Context} = test_init_info(C),
+    ContactInfo = #domain_PartyContactInfo{email = PartyId},
+    ok = party_client_thrift:create(PartyId, make_party_params(ContactInfo), Client, Context),
+    {ok, Party} = party_client_thrift:get(PartyId, Client, Context),
+    {ok, R1} = party_client_thrift:get_revision(PartyId, Client, Context),
+    #domain_Party{id = PartyId, contact_info = ContactInfo, revision = R1} = Party,
+    {ok, []} = party_client_thrift:get_claims(PartyId, Client, Context),
+    ContractParams = #payproc_ContractParams{
+        contractor = make_battle_ready_contractor(),
+        template = undefined,
+        payment_institution = #domain_PaymentInstitutionRef{id = 2}
+    },
+    NewContractId = <<PartyId/binary, ".new_contract">>,
+    Changeset = [
+        {contract_modification, #payproc_ContractModificationUnit{
+            id = NewContractId,
+            modification = {creation, ContractParams}
+        }}
+    ],
+    {ok, Claim} = party_client_thrift:create_claim(PartyId, Changeset, Client, Context),
+    #payproc_Claim{id = ClaimId, revision = Revision} = Claim,
+    {ok, R1} = party_client_thrift:get_revision(PartyId, Client, Context),
+    ok = party_client_thrift:accept_claim(PartyId, ClaimId, Revision, Client, Context),
+    {ok, R2} = party_client_thrift:get_revision(PartyId, Client, Context),
+    R2 = R1 + 1.
 
 %% Internal functions
 
