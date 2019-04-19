@@ -7,7 +7,6 @@
         stdlib,
         genlib,
         dmsl,
-        scoper,
         woody,
         woody_user_identity
     ]},

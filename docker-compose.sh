@@ -14,7 +14,7 @@ services:
         condition: service_healthy
 
   dominant:
-    image: dr.rbkmoney.com/rbkmoney/dominant:27df8b508eb971668d1a1bad8b87d646689a1660
+    image: dr.rbkmoney.com/rbkmoney/dominant:410e9d8cd821b3b738eec2881e7737e021d9141b
     command: /opt/dominant/bin/dominant foreground
     depends_on:
       machinegun:
@@ -26,7 +26,7 @@ services:
       retries: 12
 
   hellgate:
-    image: dr.rbkmoney.com/rbkmoney/hellgate:5f277756779cdd62bc40e5a9e2c1dc21a0cffbc4
+    image: dr.rbkmoney.com/rbkmoney/hellgate:eb1f950f66d2e7de359c280fa436ed6c21dc103e
     command: /opt/hellgate/bin/hellgate foreground
     depends_on:
       machinegun:
@@ -42,7 +42,7 @@ services:
       retries: 12
 
   machinegun:
-    image: dr.rbkmoney.com/rbkmoney/machinegun:27df9e276102d5c9faf8d1121374c7355d8e2d1b
+    image: dr2.rbkmoney.com/rbkmoney/machinegun:7e6c4251a801cc00dbf8340c723010d68e2d86f1
     command: /opt/machinegun/bin/machinegun foreground
     volumes:
       - ./test/machinegun/config.yaml:/opt/machinegun/etc/config.yaml
@@ -53,7 +53,7 @@ services:
       retries: 12
 
   shumway:
-    image: dr.rbkmoney.com/rbkmoney/shumway:862509b10a637d9b7ea739abd56bc6b18cf25296
+    image: dr.rbkmoney.com/rbkmoney/shumway:549cc858e6b256f2f3c34769e5f10556b8c0e696
     restart: always
     entrypoint:
       - java

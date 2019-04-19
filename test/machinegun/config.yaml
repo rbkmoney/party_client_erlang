@@ -1,7 +1,10 @@
 service_name: machinegun
 namespaces:
     party:
-        event_sink: payproc
+        event_sinks:
+            machine:
+                type: machine
+                machine_id: payproc
         processor:
             url: http://hellgate:8022/v1/stateproc/party
     domain-config:
