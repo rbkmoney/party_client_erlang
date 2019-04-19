@@ -9,7 +9,7 @@ TEMPLATES_PATH := .
 SERVICE_NAME := party_client
 
 # Build image tag to be used
-BUILD_IMAGE_TAG := 9d4d70317dd08abd400798932a231798ee254a87
+BUILD_IMAGE_TAG := fcf116dd775cc2e91bffb6a36835754e3f2d5321
 
 CALL_ANYWHERE := all submodules rebar-update compile xref lint dialyze clean distclean
 CALL_W_CONTAINER := $(CALL_ANYWHERE) test get_test_deps

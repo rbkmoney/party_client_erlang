@@ -30,7 +30,7 @@
 -type config_path() :: atom() | [atom() | [any()]].
 -type woody_service() :: woody:service().
 -type woody_options() :: woody_caching_client:options().
--type woody_transport_opts() :: woody_client_thrift_http_transport:options().
+-type woody_transport_opts() :: woody_client_thrift_http_transport:transport_options().
 
 %% API
 
@@ -60,7 +60,7 @@ get_aggressive_caching_timeout(_Client) ->
 get_woody_transport_opts(#{woody_transport_opts := Opts}) ->
     Opts;
 get_woody_transport_opts(_Client) ->
-    get_default([woody, transport_opts], []).
+    get_default([woody, transport_opts], #{}).
 
 -spec get_woody_options(client()) -> woody_options().
 get_woody_options(Client) ->
@@ -70,7 +70,7 @@ get_woody_options(Client) ->
         woody_client => #{
             url            => get_default([services, party_management]),
             event_handler  => woody_event_handler_default,
-            transport_opts => []
+            transport_opts => #{}
         }
     },
     EnvOptions = merge_nested_maps(DefaultOptions, get_default([woody, options], #{})),

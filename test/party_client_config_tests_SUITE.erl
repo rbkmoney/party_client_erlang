@@ -48,7 +48,7 @@ config_merge_test(_C) ->
             e := f,
             c := d,
             event_handler := woody_event_handler_default,
-            transport_opts := [],
+            transport_opts := #{},
             url := _Urls
         },
         workers_name := party_client_default_workers

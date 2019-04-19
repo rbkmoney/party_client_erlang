@@ -59,15 +59,6 @@ init_per_suite(Config) ->
     % _ = dbg:p(all, c),
     % _ = dbg:tpl({'scoper_woody_event_handler', 'handle_event', '_'}, x),
     AppConfig = [
-        {lager, [
-            {async_threshold, 1},
-            {async_threshold_window, 0},
-            {error_logger_hwm, 600},
-            {suppress_application_start_stop, true},
-            {handlers, [
-                {lager_common_test_backend, info}
-            ]}
-        ]},
         {dmt_client, [
             {cache_update_interval, 5000}, % milliseconds
             {max_cache_size, #{

@@ -273,14 +273,6 @@ construct_domain_fixture() ->
                     }
                 }]
             }
-        }},
-        {bank_card_bin_range, #domain_BankCardBINRangeObject{
-            ref = ?binrange(1),
-            data = #domain_BankCardBINRange{
-                name = <<"Test BIN range">>,
-                description = <<"Test BIN range">>,
-                bins = ordsets:from_list([<<"1234">>, <<"5678">>])
-            }
         }}
     ].
 
