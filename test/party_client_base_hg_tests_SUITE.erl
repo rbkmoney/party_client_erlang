@@ -1,7 +1,7 @@
 -module(party_client_base_hg_tests_SUITE).
 
--include_lib("dmsl/include/dmsl_domain_config_thrift.hrl").
--include_lib("dmsl/include/dmsl_payment_processing_thrift.hrl").
+-include_lib("damsel/include/dmsl_domain_config_thrift.hrl").
+-include_lib("damsel/include/dmsl_payment_processing_thrift.hrl").
 -include_lib("common_test/include/ct.hrl").
 
 -export([all/0]).

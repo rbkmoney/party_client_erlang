@@ -6,7 +6,7 @@
         kernel,
         stdlib,
         genlib,
-        dmsl,
+        damsel,
         woody,
         woody_user_identity
     ]},

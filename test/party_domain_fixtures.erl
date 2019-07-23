@@ -1,6 +1,6 @@
 -module(party_domain_fixtures).
 
--include_lib("dmsl/include/dmsl_domain_config_thrift.hrl").
+-include_lib("damsel/include/dmsl_domain_config_thrift.hrl").
 
 -export([construct_domain_fixture/0]).
 -export([apply_domain_fixture/0]).
