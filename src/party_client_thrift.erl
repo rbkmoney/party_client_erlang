@@ -1,6 +1,6 @@
 -module(party_client_thrift).
 
--include_lib("dmsl/include/dmsl_payment_processing_thrift.hrl").
+-include_lib("damsel/include/dmsl_payment_processing_thrift.hrl").
 
 -export([create/4]).
 -export([get/3]).
