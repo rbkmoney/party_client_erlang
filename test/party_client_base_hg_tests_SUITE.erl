@@ -160,7 +160,19 @@ contract_create_and_get_test(C) ->
     {ok, Contract} = party_client_thrift:get_contract(PartyId, ContractId, Client, Context),
     #domain_Contract{id = ContractId} = Contract,
     Timestamp = genlib_format:format_timestamp_iso8601(genlib_time:unow() + 10),
-    {ok, _Terms} = party_client_thrift:compute_contract_terms(PartyId, ContractId, Timestamp, Client, Context).
+    {ok, DomainRevision} = dmt_client_cache:update(),
+    {ok, PartyRevision} = party_client_thrift:get_revision(PartyId, Client, Context),
+    Varset = #payproc_Varset{},
+    {ok, _Terms} = party_client_thrift:compute_contract_terms(
+        PartyId,
+        ContractId,
+        Timestamp,
+        {revision, PartyRevision},
+        DomainRevision,
+        Varset,
+        Client,
+        Context
+    ).
 
 -spec shop_create_and_get_test(config()) -> any().
 shop_create_and_get_test(C) ->

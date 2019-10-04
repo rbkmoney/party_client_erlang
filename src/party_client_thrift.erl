@@ -17,7 +17,7 @@
 -export([remove_metadata/4]).
 
 -export([get_contract/4]).
--export([compute_contract_terms/5]).
+-export([compute_contract_terms/8]).
 -export([get_shop/4]).
 -export([compute_shop_terms/5]).
 -export([compute_payment_institution_terms/5]).
@@ -67,6 +67,7 @@
 -type payment_intitution_ref() :: dmsl_domain_thrift:'PaymentInstitutionRef'().
 -type varset() :: dmsl_payment_processing_thrift:'Varset'().
 -type terms() :: dmsl_domain_thrift:'TermSet'().
+-type domain_revision() :: dmsl_domain_thrift:'DataRevision'().
 -type final_cash_flow() :: dmsl_domain_thrift:'FinalCashFlow'().
 -type event_range() :: dmsl_payment_processing_thrift:'EventRange'().
 -type block_reason() :: binary().
@@ -220,12 +221,19 @@ remove_metadata(PartyId, Ns, Client, Context) ->
 get_contract(PartyId, ContractId, Client, Context) ->
     call('GetContract', [PartyId, ContractId], Client, Context).
 
--spec compute_contract_terms(party_id(), contract_id(), timestamp(), client(), context()) ->
+-spec compute_contract_terms(ID, ContractID, TS, Revision, Domain, VS, client(), context()) ->
     result(terms(), Error)
 when
+    ID :: party_id(),
+    ContractID :: contract_id(),
+    TS :: timestamp(),
+    Revision :: party_revision_param(),
+    Domain :: domain_revision(),
+    VS :: varset(),
     Error :: party_not_exists_yet() | contract_not_found().
-compute_contract_terms(PartyId, ContractId, Timestamp, Client, Context) ->
-    call('ComputeContractTerms', [PartyId, ContractId, Timestamp], Client, Context).
+compute_contract_terms(PartyId, ContractId, Timestamp, PartyRevision, DomainRevision, Varset, Client, Context) ->
+    Args = [PartyId, ContractId, Timestamp, PartyRevision, DomainRevision, Varset],
+    call('ComputeContractTerms', Args, Client, Context).
 
 -spec compute_payment_institution_terms(party_id(), payment_intitution_ref(), varset(), client(), context()) ->
     result(terms(), Error)

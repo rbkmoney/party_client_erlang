@@ -14,7 +14,7 @@ services:
         condition: service_healthy
 
   dominant:
-    image: dr.rbkmoney.com/rbkmoney/dominant:410e9d8cd821b3b738eec2881e7737e021d9141b
+    image: dr2.rbkmoney.com/rbkmoney/dominant:386a5256859cd6e56cea5efb7356d8487efdce1d
     command: /opt/dominant/bin/dominant foreground
     depends_on:
       machinegun:
@@ -26,7 +26,7 @@ services:
       retries: 12
 
   hellgate:
-    image: dr.rbkmoney.com/rbkmoney/hellgate:eb1f950f66d2e7de359c280fa436ed6c21dc103e
+    image: dr2.rbkmoney.com/rbkmoney/hellgate:104ffd64c154216125e66d3681726e9fd3261b47
     command: /opt/hellgate/bin/hellgate foreground
     depends_on:
       machinegun:
@@ -42,7 +42,7 @@ services:
       retries: 12
 
   machinegun:
-    image: dr2.rbkmoney.com/rbkmoney/machinegun:7e6c4251a801cc00dbf8340c723010d68e2d86f1
+    image: dr2.rbkmoney.com/rbkmoney/machinegun:00aa3098226e103a1a3626b3edf63864b94c4036
     command: /opt/machinegun/bin/machinegun foreground
     volumes:
       - ./test/machinegun/config.yaml:/opt/machinegun/etc/config.yaml
@@ -53,7 +53,7 @@ services:
       retries: 12
 
   shumway:
-    image: dr.rbkmoney.com/rbkmoney/shumway:549cc858e6b256f2f3c34769e5f10556b8c0e696
+    image: dr2.rbkmoney.com/rbkmoney/shumway:d36bcf5eb8b1dbba634594cac11c97ae9c66db9f
     restart: always
     entrypoint:
       - java
@@ -72,7 +72,7 @@ services:
       retries: 20
 
   shumway-db:
-    image: dr.rbkmoney.com/rbkmoney/postgres:9.6
+    image: dr2.rbkmoney.com/rbkmoney/postgres:9.6
     environment:
       - POSTGRES_DB=shumway
       - POSTGRES_USER=postgres
