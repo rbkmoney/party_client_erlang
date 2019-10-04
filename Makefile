@@ -9,9 +9,9 @@ TEMPLATES_PATH := .
 SERVICE_NAME := party_client
 
 # Build image tag to be used
-BUILD_IMAGE_TAG := cd38c35976f3684fe7552533b6175a4c3460e88b
+BUILD_IMAGE_TAG := bdc05544014b3475c8e0726d3b3d6fc81b09db96
 
-CALL_ANYWHERE := all submodules rebar-update compile xref lint dialyze clean distclean
+CALL_ANYWHERE := all submodules compile xref lint dialyze clean distclean
 CALL_W_CONTAINER := $(CALL_ANYWHERE) test get_test_deps
 
 all: compile
@@ -26,10 +26,7 @@ $(SUBTARGETS): %/.git: %
 
 submodules: $(SUBTARGETS)
 
-rebar-update:
-	$(REBAR) update
-
-compile: submodules rebar-update
+compile: submodules
 	$(REBAR) compile
 
 xref: submodules
