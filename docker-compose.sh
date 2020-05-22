@@ -26,7 +26,7 @@ services:
       retries: 12
 
   hellgate:
-    image: dr2.rbkmoney.com/rbkmoney/hellgate:104ffd64c154216125e66d3681726e9fd3261b47
+    image: dr2.rbkmoney.com/rbkmoney/hellgate:08771f8ccafb5c88be459e29933f460ef6ec78a0
     command: /opt/hellgate/bin/hellgate foreground
     depends_on:
       machinegun:
@@ -53,7 +53,7 @@ services:
       retries: 12
 
   shumway:
-    image: dr2.rbkmoney.com/rbkmoney/shumway:d36bcf5eb8b1dbba634594cac11c97ae9c66db9f
+    image: dr2.rbkmoney.com/rbkmoney/shumway:058b2459317d1bff0922574e8e8240432c2444cd
     restart: always
     entrypoint:
       - java

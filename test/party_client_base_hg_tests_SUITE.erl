@@ -44,8 +44,8 @@
 -spec all() -> [test_entry()].
 all() ->
     [
-        {group, party_management_api},
-        {group, party_management_compute_api}
+        {group, party_management_api}
+%%        {group, party_management_compute_api}
     ].
 
 -spec groups() -> [group()].
@@ -180,7 +180,7 @@ contract_create_and_get_test(C) ->
     {ok, ContractId} = create_contract(PartyId, C),
     {ok, Contract} = party_client_thrift:get_contract(PartyId, ContractId, Client, Context),
     #domain_Contract{id = ContractId} = Contract,
-    Timestamp = genlib_format:format_timestamp_iso8601(genlib_time:unow() + 10),
+    Timestamp = genlib_rfc3339:format(genlib_time:unow() + 10, millisecond),
     {ok, DomainRevision} = dmt_client_cache:update(),
     {ok, PartyRevision} = party_client_thrift:get_revision(PartyId, Client, Context),
     Varset = #payproc_Varset{},
@@ -203,7 +203,7 @@ shop_create_and_get_test(C) ->
     {ok, ShopId} = create_shop(PartyId, ContractId, C),
     {ok, Shop} = party_client_thrift:get_shop(PartyId, ShopId, Client, Context),
     #domain_Shop{id = ShopId} = Shop,
-    Timestamp = genlib_format:format_timestamp_iso8601(genlib_time:unow() + 10),
+    Timestamp = genlib_rfc3339:format(genlib_time:unow() + 10, millisecond),
     {ok, _Terms} = party_client_thrift:compute_shop_terms(PartyId, ShopId, Timestamp, Client, Context).
 
 -spec shop_operations_test(config()) -> any().

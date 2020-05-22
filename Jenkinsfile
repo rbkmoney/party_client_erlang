@@ -32,7 +32,7 @@ build('dmt_client', 'docker-host', finalHook) {
       sh 'make wc_xref'
     }
     runStage('dialyze') {
-      withWsCache("_build/default/rebar3_21.3.8.4_plt") {
+      withWsCache("_build/default/rebar3_22.3.1_plt") {
         sh 'make wc_dialyze'
       }
     }
