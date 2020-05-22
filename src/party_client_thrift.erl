@@ -19,7 +19,7 @@
 -export([get_contract/4]).
 -export([compute_contract_terms/8]).
 -export([get_shop/4]).
--export([compute_shop_terms/5]).
+-export([compute_shop_terms/6]).
 -export([compute_p2p_provider/5]).
 -export([compute_withdrawal_provider/5]).
 -export([compute_payment_provider/5]).
@@ -340,12 +340,12 @@ suspend_shop(PartyId, ShopId, Client, Context) ->
 activate_shop(PartyId, ShopId, Client, Context) ->
     call('ActivateShop', [PartyId, ShopId], Client, Context).
 
--spec compute_shop_terms(party_id(), shop_id(), timestamp(), client(), context()) ->
+-spec compute_shop_terms(party_id(), shop_id(), timestamp(), party_revision_param(), client(), context()) ->
     result(terms(), Error)
 when
     Error :: shop_not_found() | invalid_shop_status() | party_not_exists_yet().
-compute_shop_terms(PartyId, ShopId, Timestamp, Client, Context) ->
-    call('ComputeShopTerms', [PartyId, ShopId, Timestamp], Client, Context).
+compute_shop_terms(PartyId, ShopId, Timestamp, PartyRevision, Client, Context) ->
+    call('ComputeShopTerms', [PartyId, ShopId, Timestamp, PartyRevision], Client, Context).
 
 -spec get_claim(party_id(), claim_id(), client(), context()) -> result(claim(), Error) when
     Error :: claim_not_found().

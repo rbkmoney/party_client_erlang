@@ -204,7 +204,10 @@ shop_create_and_get_test(C) ->
     {ok, Shop} = party_client_thrift:get_shop(PartyId, ShopId, Client, Context),
     #domain_Shop{id = ShopId} = Shop,
     Timestamp = genlib_rfc3339:format(genlib_time:unow() + 10, millisecond),
-    {ok, _Terms} = party_client_thrift:compute_shop_terms(PartyId, ShopId, Timestamp, Client, Context).
+    {ok, PartyRevision} = party_client_thrift:get_revision(PartyId, Client, Context),
+    PartyRevisionParam = {revision, PartyRevision},
+    {ok, _Terms} =
+        party_client_thrift:compute_shop_terms(PartyId, ShopId, Timestamp, PartyRevisionParam, Client, Context).
 
 -spec shop_operations_test(config()) -> any().
 shop_operations_test(C) ->
