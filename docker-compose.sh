@@ -26,7 +26,7 @@ services:
       retries: 12
 
   hellgate:
-    image: dr2.rbkmoney.com/rbkmoney/hellgate:08771f8ccafb5c88be459e29933f460ef6ec78a0
+    image: dr2.rbkmoney.com/rbkmoney/hellgate:05e6c7ad9190a410796628bba04f5ae88101857f
     command: /opt/hellgate/bin/hellgate foreground
     depends_on:
       machinegun:
