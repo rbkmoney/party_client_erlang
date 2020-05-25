@@ -1,47 +1,12 @@
 -module(party_domain_fixtures).
 
+-include("party_domain_fixtures.hrl").
 -include_lib("damsel/include/dmsl_domain_config_thrift.hrl").
 
 -export([construct_domain_fixture/0]).
 -export([apply_domain_fixture/0]).
 -export([apply_domain_fixture/1]).
 -export([cleanup/0]).
-
-%% Internal macro helpers
-
--define(ordset(Es),     ordsets:from_list(Es)).
-
--define(cur(ID),        #domain_CurrencyRef{symbolic_code = ID}).
--define(pmt(C, T),      #domain_PaymentMethodRef{id = {C, T}}).
--define(pomt(M),        #domain_PayoutMethodRef{id = M}).
--define(cat(ID),        #domain_CategoryRef{id = ID}).
--define(prx(ID),        #domain_ProxyRef{id = ID}).
--define(tmpl(ID),       #domain_ContractTemplateRef{id = ID}).
--define(trms(ID),       #domain_TermSetHierarchyRef{id = ID}).
--define(sas(ID),        #domain_SystemAccountSetRef{id = ID}).
--define(eas(ID),        #domain_ExternalAccountSetRef{id = ID}).
--define(insp(ID),       #domain_InspectorRef{id = ID}).
--define(pinst(ID),      #domain_PaymentInstitutionRef{id = ID}).
--define(binrange(ID),   #domain_BankCardBINRangeRef{id = ID}).
--define(bussched(ID),   #domain_BusinessScheduleRef{id = ID}).
-
--define(cfpost(A1, A2, V),
-    #domain_CashFlowPosting{
-        source      = A1,
-        destination = A2,
-        volume      = V
-    }
-).
-
--define(share(P, Q, C), {share, #domain_CashVolumeShare{parts = #'Rational'{p = P, q = Q}, 'of' = C}}).
-
--define(tkz_bank_card(PaymentSystem, TokenProvider),
-    #domain_TokenizedBankCard{
-        payment_system = PaymentSystem,
-        token_provider = TokenProvider
-    }).
-
--define(every, {every, #'ScheduleEvery'{}}).
 
 %% Internal types
 
@@ -69,6 +34,7 @@ apply_domain_fixture() ->
 apply_domain_fixture(Fixture) ->
     #'Snapshot'{version = Head} = dmt_client:checkout({head, #'Head'{}}),
     Commit = #'Commit'{ops = [{insert, #'InsertOp'{object = F}} || F <- Fixture]},
+%%    logger:error("Fixture: ~p~nCommit: ~p", [Fixture, Commit]),
     _NextRevision = dmt_client:commit(Head, Commit),
     ok.
 
@@ -272,6 +238,191 @@ construct_domain_fixture() ->
                         }
                     }
                 }]
+            }
+        }},
+        {withdrawal_provider, #domain_WithdrawalProviderObject{
+            ref = ?wtdrlprov(1),
+            data = #domain_WithdrawalProvider{
+                name = <<"WithdrawalProvider">>,
+                proxy = #domain_Proxy{ref = ?prx(1), additional = #{}},
+                identity = undefined,
+                withdrawal_terms = #domain_WithdrawalProvisionTerms{
+                    currencies = {value, ?ordset([?cur(<<"RUB">>), ?cur(<<"USD">>)])},
+                    payout_methods = {value, ?ordset([])},
+                    cash_limit = {value, ?cashrng(
+                        {inclusive, ?cash(       0, <<"RUB">>)},
+                        {exclusive, ?cash(10000000, <<"RUB">>)}
+                    )},
+                    cash_flow = {decisions, [
+                        #domain_CashFlowDecision{
+                            if_   = {condition, {currency_is, ?cur(<<"RUB">>)}},
+                            then_ = {value, [
+                                ?cfpost(
+                                    {system, settlement},
+                                    {provider, settlement},
+                                    {product, {min_of, ?ordset([
+                                        ?fixed(10, <<"RUB">>),
+                                        ?share(5, 100, operation_amount, round_half_towards_zero)
+                                    ])}}
+                                )
+                            ]}
+                        },
+                        #domain_CashFlowDecision{
+                            if_   = {condition, {currency_is, ?cur(<<"USD">>)}},
+                            then_ = {value, [
+                                ?cfpost(
+                                    {system, settlement},
+                                    {provider, settlement},
+                                    {product, {min_of, ?ordset([
+                                        ?fixed(10, <<"USD">>),
+                                        ?share(5, 100, operation_amount, round_half_towards_zero)
+                                    ])}}
+                                )
+                            ]}
+                        }
+                    ]}
+                }
+            }
+        }},
+
+        {provider, #domain_ProviderObject{
+            ref = ?prv(1),
+            data = #domain_Provider{
+                name = <<"Brovider">>,
+                description = <<"A provider but bro">>,
+                terminal = {value, [?prvtrm(1)]},
+                proxy = #domain_Proxy{ref = ?prx(1), additional = #{}},
+                abs_account = <<"1234567890">>,
+                payment_terms = #domain_PaymentsProvisionTerms{
+                    currencies = {value, ?ordset([?cur(<<"RUB">>)])},
+                    categories = {value, ?ordset([?cat(1)])},
+                    payment_methods = {value, ?ordset([
+                        ?pmt(bank_card, visa),
+                        ?pmt(bank_card, mastercard)
+                    ])},
+                    cash_limit = {value, ?cashrng(
+                        {inclusive, ?cash(      1000, <<"RUB">>)},
+                        {exclusive, ?cash(1000000000, <<"RUB">>)}
+                    )},
+                    cash_flow = {decisions, [
+                        #domain_CashFlowDecision{
+                            if_   = {condition, {currency_is, ?cur(<<"RUB">>)}},
+                            then_ = {value, [
+                                ?cfpost(
+                                    {system, settlement},
+                                    {provider, settlement},
+                                    {product, {min_of, ?ordset([
+                                        ?fixed(10, <<"RUB">>),
+                                        ?share(5, 100, operation_amount, round_half_towards_zero)
+                                    ])}}
+                                )
+                            ]}
+                        },
+                        #domain_CashFlowDecision{
+                            if_   = {condition, {currency_is, ?cur(<<"USD">>)}},
+                            then_ = {value, [
+                                ?cfpost(
+                                    {system, settlement},
+                                    {provider, settlement},
+                                    {product, {min_of, ?ordset([
+                                        ?fixed(10, <<"USD">>),
+                                        ?share(5, 100, operation_amount, round_half_towards_zero)
+                                    ])}}
+                                )
+                            ]}
+                        }
+                    ]}
+                },
+                recurrent_paytool_terms = #domain_RecurrentPaytoolsProvisionTerms{
+                    categories = {value, ?ordset([?cat(1)])},
+                    payment_methods = {value, ?ordset([
+                        ?pmt(bank_card, visa),
+                        ?pmt(bank_card, mastercard)
+                    ])},
+                    cash_value = {decisions, [
+                        #domain_CashValueDecision{
+                            if_   = {condition, {currency_is, ?cur(<<"RUB">>)}},
+                            then_ = {value, ?cash(1000, <<"RUB">>)}
+                        },
+                        #domain_CashValueDecision{
+                            if_   = {condition, {currency_is, ?cur(<<"USD">>)}},
+                            then_ = {value, ?cash(1000, <<"USD">>)}
+                        }
+                    ]}
+                }
+            }
+        }},
+
+        {terminal, #domain_TerminalObject{
+            ref = ?trm(1),
+            data = #domain_Terminal{
+                name = <<"Brominal 1">>,
+                description = <<"Brominal 1">>,
+                risk_coverage = high,
+                terms = #domain_PaymentsProvisionTerms{
+                    payment_methods = {value, ?ordset([
+                        ?pmt(bank_card, visa)
+                    ])}
+                }
+            }
+        }},
+
+        {p2p_provider, #domain_P2PProviderObject{
+            ref = ?p2pprov(1),
+            data = #domain_P2PProvider{
+                name = <<"P2PProvider">>,
+                proxy = #domain_Proxy{ref = ?prx(1), additional = #{}},
+                identity = undefined,
+                accounts = undefined,
+                p2p_terms = #domain_P2PProvisionTerms{
+                    currencies = {value, ?ordset([?cur(<<"RUB">>), ?cur(<<"USD">>)])},
+                    cash_limit = {value, ?cashrng(
+                        {inclusive, ?cash(       0, <<"RUB">>)},
+                        {exclusive, ?cash(10000000, <<"RUB">>)}
+                    )},
+                    cash_flow = {decisions, [
+                        #domain_CashFlowDecision{
+                            if_   = {condition, {currency_is, ?cur(<<"RUB">>)}},
+                            then_ = {value, [
+                                ?cfpost(
+                                    {system, settlement},
+                                    {provider, settlement},
+                                    {product, {min_of, ?ordset([
+                                        ?fixed(10, <<"RUB">>),
+                                        ?share(5, 100, operation_amount, round_half_towards_zero)
+                                    ])}}
+                                )
+                            ]}
+                        },
+                        #domain_CashFlowDecision{
+                            if_   = {condition, {currency_is, ?cur(<<"USD">>)}},
+                            then_ = {value, [
+                                ?cfpost(
+                                    {system, settlement},
+                                    {provider, settlement},
+                                    {product, {min_of, ?ordset([
+                                        ?fixed(10, <<"USD">>),
+                                        ?share(5, 100, operation_amount, round_half_towards_zero)
+                                    ])}}
+                                )
+                            ]}
+                        }
+                    ]},
+                    fees = {decisions, [
+                        #domain_FeeDecision{
+                            if_ = {condition, {currency_is, ?cur(<<"RUB">>)}},
+                            then_ = {value, #domain_Fees{
+                                fees = #{surplus => ?share(1, 1, operation_amount)}
+                            }}
+                        },
+                        #domain_FeeDecision{
+                            if_ = {condition, {currency_is, ?cur(<<"USD">>)}},
+                            then_ = {value, #domain_Fees{
+                                fees = #{surplus => ?share(1, 1, operation_amount)}
+                            }}
+                        }
+                    ]}
+                }
             }
         }}
     ].

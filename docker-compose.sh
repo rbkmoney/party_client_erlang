@@ -14,7 +14,7 @@ services:
         condition: service_healthy
 
   dominant:
-    image: dr2.rbkmoney.com/rbkmoney/dominant:386a5256859cd6e56cea5efb7356d8487efdce1d
+    image: dr2.rbkmoney.com/rbkmoney/dominant:f91f085474ece183724ee8646f0ea8df66633b54
     command: /opt/dominant/bin/dominant foreground
     depends_on:
       machinegun:
@@ -26,7 +26,7 @@ services:
       retries: 12
 
   hellgate:
-    image: dr2.rbkmoney.com/rbkmoney/hellgate:104ffd64c154216125e66d3681726e9fd3261b47
+    image: dr2.rbkmoney.com/rbkmoney/hellgate:05e6c7ad9190a410796628bba04f5ae88101857f
     command: /opt/hellgate/bin/hellgate foreground
     depends_on:
       machinegun:
@@ -53,7 +53,7 @@ services:
       retries: 12
 
   shumway:
-    image: dr2.rbkmoney.com/rbkmoney/shumway:d36bcf5eb8b1dbba634594cac11c97ae9c66db9f
+    image: dr2.rbkmoney.com/rbkmoney/shumway:058b2459317d1bff0922574e8e8240432c2444cd
     restart: always
     entrypoint:
       - java

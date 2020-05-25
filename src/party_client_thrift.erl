@@ -19,8 +19,13 @@
 -export([get_contract/4]).
 -export([compute_contract_terms/8]).
 -export([get_shop/4]).
--export([compute_shop_terms/5]).
+-export([compute_shop_terms/6]).
+-export([compute_p2p_provider/5]).
+-export([compute_withdrawal_provider/5]).
+-export([compute_payment_provider/5]).
+-export([compute_payment_provider_terminal_terms/6]).
 -export([compute_payment_institution_terms/5]).
+-export([compute_payment_institution/5]).
 -export([compute_payout_cash_flow/4]).
 
 -export([block_shop/5]).
@@ -64,6 +69,10 @@
 -type timestamp() :: dmsl_base_thrift:'Timestamp'().
 -type party_revision_param() :: dmsl_payment_processing_thrift:'PartyRevisionParam'().
 -type payout_params() :: dmsl_payment_processing_thrift:'PayoutParams'().
+-type p2p_provider_ref() :: dmsl_domain_thrift:'P2PProviderRef'().
+-type withdrawal_provider_ref() :: dmsl_domain_thrift:'WithdrawalProviderRef'().
+-type payment_provider_ref() :: dmsl_domain_thrift:'ProviderRef'().
+-type terminal_ref() :: dmsl_domain_thrift:'TerminalRef'().
 -type payment_intitution_ref() :: dmsl_domain_thrift:'PaymentInstitutionRef'().
 -type varset() :: dmsl_payment_processing_thrift:'Varset'().
 -type terms() :: dmsl_domain_thrift:'TermSet'().
@@ -96,6 +105,10 @@
 -export_type([timestamp/0]).
 -export_type([party_revision_param/0]).
 -export_type([payout_params/0]).
+-export_type([p2p_provider_ref/0]).
+-export_type([withdrawal_provider_ref/0]).
+-export_type([payment_provider_ref/0]).
+-export_type([terminal_ref/0]).
 -export_type([payment_intitution_ref/0]).
 -export_type([varset/0]).
 -export_type([terms/0]).
@@ -129,6 +142,8 @@
 -type not_permitted() :: dmsl_payment_processing_thrift:'OperationNotPermitted'().
 -type event_not_found() :: dmsl_payment_processing_thrift:'EventNotFound'().
 -type invalid_request() :: dmsl_base_thrift:'InvalidRequest'().
+-type provider_not_found() :: dmsl_payment_processing_thrift:'ProviderNotFound'().
+-type terminal_not_found() :: dmsl_payment_processing_thrift:'TerminalNotFound'().
 
 %% Client types
 
@@ -235,12 +250,63 @@ compute_contract_terms(PartyId, ContractId, Timestamp, PartyRevision, DomainRevi
     Args = [PartyId, ContractId, Timestamp, PartyRevision, DomainRevision, Varset],
     call('ComputeContractTerms', Args, Client, Context).
 
+-spec compute_p2p_provider(Ref, Domain, Varset, client(), context()) ->
+    result(terms(), Error)
+    when
+    Ref :: p2p_provider_ref(),
+    Domain :: domain_revision(),
+    Varset :: varset(),
+    Error :: provider_not_found().
+compute_p2p_provider(Ref, Domain, Varset, Client, Context) ->
+    call('ComputeP2PProvider', [Ref, Domain, Varset], Client, Context).
+
+-spec compute_withdrawal_provider(Ref, Domain, Varset, client(), context()) ->
+    result(terms(), Error)
+    when
+    Ref :: withdrawal_provider_ref(),
+    Domain :: domain_revision(),
+    Varset :: varset(),
+    Error :: provider_not_found().
+compute_withdrawal_provider(Ref, Domain, Varset, Client, Context) ->
+    call('ComputeWithdrawalProvider', [Ref, Domain, Varset], Client, Context).
+
+-spec compute_payment_provider(Ref, Domain, Varset, client(), context()) ->
+    result(terms(), Error)
+    when
+    Ref :: payment_provider_ref(),
+    Domain :: domain_revision(),
+    Varset :: varset(),
+    Error :: provider_not_found().
+compute_payment_provider(Ref, Domain, Varset, Client, Context) ->
+    call('ComputePaymentProvider', [Ref, Domain, Varset], Client, Context).
+
+-spec compute_payment_provider_terminal_terms(Ref, TerminalRef, Domain, Varset, client(), context()) ->
+    result(terms(), Error)
+    when
+    Ref :: payment_provider_ref(),
+    TerminalRef :: terminal_ref(),
+    Domain :: domain_revision(),
+    Varset :: varset(),
+    Error :: provider_not_found() | terminal_not_found().
+compute_payment_provider_terminal_terms(Ref, TerminalRef, Domain, Varset, Client, Context) ->
+    call('ComputePaymentProviderTerminalTerms', [Ref, TerminalRef, Domain, Varset], Client, Context).
+
 -spec compute_payment_institution_terms(party_id(), payment_intitution_ref(), varset(), client(), context()) ->
     result(terms(), Error)
 when
     Error :: payment_institution_not_found().
 compute_payment_institution_terms(PartyId, Ref, Varset, Client, Context) ->
     call('ComputePaymentInstitutionTerms', [PartyId, Ref, Varset], Client, Context).
+
+-spec compute_payment_institution(Ref, Domain, Varset, client(), context()) ->
+    result(terms(), Error)
+when
+    Ref :: payment_intitution_ref(),
+    Domain :: domain_revision(),
+    Varset :: varset(),
+    Error :: payment_institution_not_found().
+compute_payment_institution(Ref, Domain, Varset, Client, Context) ->
+    call('ComputePaymentInstitution', [Ref, Domain, Varset], Client, Context).
 
 -spec compute_payout_cash_flow(party_id(), payout_params(), client(), context()) ->
     result(final_cash_flow(), Error)
@@ -274,12 +340,12 @@ suspend_shop(PartyId, ShopId, Client, Context) ->
 activate_shop(PartyId, ShopId, Client, Context) ->
     call('ActivateShop', [PartyId, ShopId], Client, Context).
 
--spec compute_shop_terms(party_id(), shop_id(), timestamp(), client(), context()) ->
+-spec compute_shop_terms(party_id(), shop_id(), timestamp(), party_revision_param(), client(), context()) ->
     result(terms(), Error)
 when
     Error :: shop_not_found() | invalid_shop_status() | party_not_exists_yet().
-compute_shop_terms(PartyId, ShopId, Timestamp, Client, Context) ->
-    call('ComputeShopTerms', [PartyId, ShopId, Timestamp], Client, Context).
+compute_shop_terms(PartyId, ShopId, Timestamp, PartyRevision, Client, Context) ->
+    call('ComputeShopTerms', [PartyId, ShopId, Timestamp, PartyRevision], Client, Context).
 
 -spec get_claim(party_id(), claim_id(), client(), context()) -> result(claim(), Error) when
     Error :: claim_not_found().
