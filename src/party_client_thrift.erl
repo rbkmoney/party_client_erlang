@@ -73,6 +73,7 @@
 -type withdrawal_provider_ref() :: dmsl_domain_thrift:'WithdrawalProviderRef'().
 -type payment_provider_ref() :: dmsl_domain_thrift:'ProviderRef'().
 -type terminal_ref() :: dmsl_domain_thrift:'TerminalRef'().
+-type payment_intitution() :: dmsl_domain_thrift:'PaymentInstitution'().
 -type payment_intitution_ref() :: dmsl_domain_thrift:'PaymentInstitutionRef'().
 -type varset() :: dmsl_payment_processing_thrift:'Varset'().
 -type terms() :: dmsl_domain_thrift:'TermSet'().
@@ -299,7 +300,7 @@ compute_payment_institution_terms(PartyId, Ref, Varset, Client, Context) ->
     call('ComputePaymentInstitutionTerms', [PartyId, Ref, Varset], Client, Context).
 
 -spec compute_payment_institution(Ref, Domain, Varset, client(), context()) ->
-    result(terms(), Error)
+    result(payment_intitution(), Error)
 when
     Ref :: payment_intitution_ref(),
     Domain :: domain_revision(),
