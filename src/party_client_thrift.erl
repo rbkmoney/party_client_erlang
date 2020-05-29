@@ -73,8 +73,8 @@
 -type withdrawal_provider_ref() :: dmsl_domain_thrift:'WithdrawalProviderRef'().
 -type payment_provider_ref() :: dmsl_domain_thrift:'ProviderRef'().
 -type terminal_ref() :: dmsl_domain_thrift:'TerminalRef'().
--type payment_intitution() :: dmsl_domain_thrift:'PaymentInstitution'().
--type payment_intitution_ref() :: dmsl_domain_thrift:'PaymentInstitutionRef'().
+-type payment_institution() :: dmsl_domain_thrift:'PaymentInstitution'().
+-type payment_institution_ref() :: dmsl_domain_thrift:'PaymentInstitutionRef'().
 -type varset() :: dmsl_payment_processing_thrift:'Varset'().
 -type terms() :: dmsl_domain_thrift:'TermSet'().
 -type domain_revision() :: dmsl_domain_thrift:'DataRevision'().
@@ -110,7 +110,7 @@
 -export_type([withdrawal_provider_ref/0]).
 -export_type([payment_provider_ref/0]).
 -export_type([terminal_ref/0]).
--export_type([payment_intitution_ref/0]).
+-export_type([payment_institution_ref/0]).
 -export_type([varset/0]).
 -export_type([terms/0]).
 -export_type([final_cash_flow/0]).
@@ -292,7 +292,7 @@ compute_payment_provider(Ref, Domain, Varset, Client, Context) ->
 compute_payment_provider_terminal_terms(Ref, TerminalRef, Domain, Varset, Client, Context) ->
     call('ComputePaymentProviderTerminalTerms', [Ref, TerminalRef, Domain, Varset], Client, Context).
 
--spec compute_payment_institution_terms(party_id(), payment_intitution_ref(), varset(), client(), context()) ->
+-spec compute_payment_institution_terms(party_id(), payment_institution_ref(), varset(), client(), context()) ->
     result(terms(), Error)
 when
     Error :: payment_institution_not_found().
@@ -300,9 +300,9 @@ compute_payment_institution_terms(PartyId, Ref, Varset, Client, Context) ->
     call('ComputePaymentInstitutionTerms', [PartyId, Ref, Varset], Client, Context).
 
 -spec compute_payment_institution(Ref, Domain, Varset, client(), context()) ->
-    result(payment_intitution(), Error)
+    result(payment_institution(), Error)
 when
-    Ref :: payment_intitution_ref(),
+    Ref :: payment_institution_ref(),
     Domain :: domain_revision(),
     Varset :: varset(),
     Error :: payment_institution_not_found().
