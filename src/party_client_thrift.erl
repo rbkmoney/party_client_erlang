@@ -70,9 +70,13 @@
 -type party_revision_param() :: dmsl_payment_processing_thrift:'PartyRevisionParam'().
 -type payout_params() :: dmsl_payment_processing_thrift:'PayoutParams'().
 -type p2p_provider_ref() :: dmsl_domain_thrift:'P2PProviderRef'().
+-type p2p_provider() :: dmsl_domain_thrift:'P2PProvider'().
 -type withdrawal_provider_ref() :: dmsl_domain_thrift:'WithdrawalProviderRef'().
+-type withdrawal_provider() :: dmsl_domain_thrift:'WithdrawalProvider'().
 -type payment_provider_ref() :: dmsl_domain_thrift:'ProviderRef'().
+-type payment_provider() :: dmsl_domain_thrift:'Provider'().
 -type terminal_ref() :: dmsl_domain_thrift:'TerminalRef'().
+-type payment_provision_terms() :: dmsl_domain_thrift:'PaymentsProvisionTerms'().
 -type payment_institution() :: dmsl_domain_thrift:'PaymentInstitution'().
 -type payment_institution_ref() :: dmsl_domain_thrift:'PaymentInstitutionRef'().
 -type varset() :: dmsl_payment_processing_thrift:'Varset'().
@@ -107,9 +111,13 @@
 -export_type([party_revision_param/0]).
 -export_type([payout_params/0]).
 -export_type([p2p_provider_ref/0]).
+-export_type([p2p_provider/0]).
 -export_type([withdrawal_provider_ref/0]).
+-export_type([withdrawal_provider/0]).
 -export_type([payment_provider_ref/0]).
+-export_type([payment_provider/0]).
 -export_type([terminal_ref/0]).
+-export_type([payment_provision_terms/0]).
 -export_type([payment_institution_ref/0]).
 -export_type([varset/0]).
 -export_type([terms/0]).
@@ -252,7 +260,7 @@ compute_contract_terms(PartyId, ContractId, Timestamp, PartyRevision, DomainRevi
     call('ComputeContractTerms', Args, Client, Context).
 
 -spec compute_p2p_provider(Ref, Domain, Varset, client(), context()) ->
-    result(terms(), Error)
+    result(p2p_provider(), Error)
     when
     Ref :: p2p_provider_ref(),
     Domain :: domain_revision(),
@@ -262,7 +270,7 @@ compute_p2p_provider(Ref, Domain, Varset, Client, Context) ->
     call('ComputeP2PProvider', [Ref, Domain, Varset], Client, Context).
 
 -spec compute_withdrawal_provider(Ref, Domain, Varset, client(), context()) ->
-    result(terms(), Error)
+    result(withdrawal_provider(), Error)
     when
     Ref :: withdrawal_provider_ref(),
     Domain :: domain_revision(),
@@ -272,7 +280,7 @@ compute_withdrawal_provider(Ref, Domain, Varset, Client, Context) ->
     call('ComputeWithdrawalProvider', [Ref, Domain, Varset], Client, Context).
 
 -spec compute_payment_provider(Ref, Domain, Varset, client(), context()) ->
-    result(terms(), Error)
+    result(payment_provider(), Error)
     when
     Ref :: payment_provider_ref(),
     Domain :: domain_revision(),
@@ -282,7 +290,7 @@ compute_payment_provider(Ref, Domain, Varset, Client, Context) ->
     call('ComputePaymentProvider', [Ref, Domain, Varset], Client, Context).
 
 -spec compute_payment_provider_terminal_terms(Ref, TerminalRef, Domain, Varset, client(), context()) ->
-    result(terms(), Error)
+    result(payment_provision_terms(), Error)
     when
     Ref :: payment_provider_ref(),
     TerminalRef :: terminal_ref(),
