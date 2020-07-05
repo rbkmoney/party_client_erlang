@@ -24,14 +24,10 @@
 -export([claim_operations_test/1]).
 -export([get_revision_test/1]).
 
--export([compute_p2p_provider_ok/1]).
--export([compute_p2p_provider_not_found/1]).
--export([compute_withdrawal_provider_ok/1]).
--export([compute_withdrawal_provider_not_found/1]).
--export([compute_payment_provider_ok/1]).
--export([compute_payment_provider_not_found/1]).
--export([compute_payment_provider_terminal_terms_ok/1]).
--export([compute_payment_provider_terminal_terms_not_found/1]).
+-export([compute_provider_ok/1]).
+-export([compute_provider_not_found/1]).
+-export([compute_provider_terminal_terms_ok/1]).
+-export([compute_provider_terminal_terms_not_found/1]).
 
 %% Internal types
 
@@ -63,14 +59,10 @@ groups() ->
             get_revision_test
         ]},
         {party_management_compute_api, [parallel], [
-            compute_p2p_provider_ok,
-            compute_p2p_provider_not_found,
-            compute_withdrawal_provider_ok,
-            compute_withdrawal_provider_not_found,
-            compute_payment_provider_ok,
-            compute_payment_provider_not_found,
-            compute_payment_provider_terminal_terms_ok,
-            compute_payment_provider_terminal_terms_not_found
+            compute_provider_ok,
+            compute_provider_not_found,
+            compute_provider_terminal_terms_ok,
+            compute_provider_terminal_terms_not_found
         ]}
     ].
 
@@ -280,66 +272,8 @@ get_revision_test(C) ->
     {ok, R2} = party_client_thrift:get_revision(PartyId, Client, Context),
     R2 = R1 + 1.
 
--spec compute_p2p_provider_ok(config()) -> any().
-compute_p2p_provider_ok(C) ->
-    {ok, _PartyId, Client, Context} = test_init_info(C),
-    {ok, DomainRevision} = dmt_client_cache:update(),
-    Varset = #payproc_Varset{
-        currency = ?cur(<<"RUB">>)
-    },
-    CashFlow = ?cfpost(
-        {system, settlement},
-        {provider, settlement},
-        {product, {min_of, ?ordset([
-            ?fixed(10, <<"RUB">>),
-            ?share(5, 100, operation_amount, round_half_towards_zero)
-        ])}}
-    ),
-    {ok, #domain_P2PProvider{
-        p2p_terms = #domain_P2PProvisionTerms{
-            cash_flow = {value, [CashFlow]}
-        }
-    }} = party_client_thrift:compute_p2p_provider(?p2pprov(1), DomainRevision, Varset, Client, Context).
-
--spec compute_p2p_provider_not_found(config()) -> any().
-compute_p2p_provider_not_found(C) ->
-    {ok, _PartyId, Client, Context} = test_init_info(C),
-    {ok, DomainRevision} = dmt_client_cache:update(),
-    {error, #payproc_ProviderNotFound{}} =
-        party_client_thrift:compute_p2p_provider(
-            ?p2pprov(2), DomainRevision, #payproc_Varset{}, Client, Context).
-
--spec compute_withdrawal_provider_ok(config()) -> any().
-compute_withdrawal_provider_ok(C) ->
-    {ok, _PartyId, Client, Context} = test_init_info(C),
-    {ok, DomainRevision} = dmt_client_cache:update(),
-    Varset = #payproc_Varset{
-        currency = ?cur(<<"RUB">>)
-    },
-    CashFlow = ?cfpost(
-        {system, settlement},
-        {provider, settlement},
-        {product, {min_of, ?ordset([
-            ?fixed(10, <<"RUB">>),
-            ?share(5, 100, operation_amount, round_half_towards_zero)
-        ])}}
-    ),
-    {ok, #domain_WithdrawalProvider{
-        withdrawal_terms = #domain_WithdrawalProvisionTerms{
-            cash_flow = {value, [CashFlow]}
-        }
-    }} = party_client_thrift:compute_withdrawal_provider(?wtdrlprov(1), DomainRevision, Varset, Client, Context).
-
--spec compute_withdrawal_provider_not_found(config()) -> any().
-compute_withdrawal_provider_not_found(C) ->
-    {ok, _PartyId, Client, Context} = test_init_info(C),
-    {ok, DomainRevision} = dmt_client_cache:update(),
-    {error, #payproc_ProviderNotFound{}} =
-        party_client_thrift:compute_withdrawal_provider(
-            ?wtdrlprov(2), DomainRevision, #payproc_Varset{}, Client, Context).
-
--spec compute_payment_provider_ok(config()) -> any().
-compute_payment_provider_ok(C) ->
+-spec compute_provider_ok(config()) -> any().
+compute_provider_ok(C) ->
     {ok, _PartyId, Client, Context} = test_init_info(C),
     {ok, DomainRevision} = dmt_client_cache:update(),
     Varset = #payproc_Varset{
@@ -362,16 +296,16 @@ compute_payment_provider_ok(C) ->
         }
     }} = party_client_thrift:compute_payment_provider(?prv(1), DomainRevision, Varset, Client, Context).
 
--spec compute_payment_provider_not_found(config()) -> any().
-compute_payment_provider_not_found(C) ->
+-spec compute_provider_not_found(config()) -> any().
+compute_provider_not_found(C) ->
     {ok, _PartyId, Client, Context} = test_init_info(C),
     {ok, DomainRevision} = dmt_client_cache:update(),
     {error, #payproc_ProviderNotFound{}} =
         party_client_thrift:compute_payment_provider(
             ?prv(2), DomainRevision, #payproc_Varset{}, Client, Context).
 
--spec compute_payment_provider_terminal_terms_ok(config()) -> any().
-compute_payment_provider_terminal_terms_ok(C) ->
+-spec compute_provider_terminal_terms_ok(config()) -> any().
+compute_provider_terminal_terms_ok(C) ->
     {ok, _PartyId, Client, Context} = test_init_info(C),
     {ok, DomainRevision} = dmt_client_cache:update(),
     Varset = #payproc_Varset{
@@ -392,8 +326,8 @@ compute_payment_provider_terminal_terms_ok(C) ->
     }} = party_client_thrift:compute_payment_provider_terminal_terms(
         ?prv(1), ?trm(1), DomainRevision, Varset, Client, Context).
 
--spec compute_payment_provider_terminal_terms_not_found(config()) -> any().
-compute_payment_provider_terminal_terms_not_found(C) ->
+-spec compute_provider_terminal_terms_not_found(config()) -> any().
+compute_provider_terminal_terms_not_found(C) ->
     {ok, _PartyId, Client, Context} = test_init_info(C),
     {ok, DomainRevision} = dmt_client_cache:update(),
     {error, #payproc_TerminalNotFound{}} =
