@@ -288,11 +288,13 @@ compute_provider_ok(C) ->
         ])}}
     ),
     {ok, #domain_Provider{
-        payment_terms = #domain_PaymentsProvisionTerms{
-            cash_flow = {value, [CashFlow]}
-        },
-        recurrent_paytool_terms = #domain_RecurrentPaytoolsProvisionTerms{
-            cash_value = {value, ?cash(1000, <<"RUB">>)}
+        terms = #domain_ProvisionTermSet{
+            payments = #domain_PaymentsProvisionTerms{
+                cash_flow = {value, [CashFlow]}
+            },
+            recurrent_paytools = #domain_RecurrentPaytoolsProvisionTerms{
+                cash_value = {value, ?cash(1000, <<"RUB">>)}
+            }
         }
     }} = party_client_thrift:compute_payment_provider(?prv(1), DomainRevision, Varset, Client, Context).
 
@@ -320,10 +322,11 @@ compute_provider_terminal_terms_ok(C) ->
         ])}}
     ),
     PaymentMethods = ?ordset([?pmt(bank_card, visa)]),
-    {ok, #domain_PaymentsProvisionTerms{
-        cash_flow = {value, [CashFlow]},
-        payment_methods = {value, PaymentMethods}
-    }} = party_client_thrift:compute_payment_provider_terminal_terms(
+    {ok,#domain_ProvisionTermSet{
+        payments = #domain_PaymentsProvisionTerms{
+            cash_flow = {value, [CashFlow]},
+            payment_methods = {value, PaymentMethods}
+        }}} = party_client_thrift:compute_payment_provider_terminal_terms(
         ?prv(1), ?trm(1), DomainRevision, Varset, Client, Context).
 
 -spec compute_provider_terminal_terms_not_found(config()) -> any().
