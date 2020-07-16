@@ -322,7 +322,7 @@ compute_provider_terminal_terms_ok(C) ->
         ])}}
     ),
     PaymentMethods = ?ordset([?pmt(bank_card, visa)]),
-    {ok,#domain_ProvisionTermSet{
+    {ok, #domain_ProvisionTermSet{
         payments = #domain_PaymentsProvisionTerms{
             cash_flow = {value, [CashFlow]},
             payment_methods = {value, PaymentMethods}
