@@ -20,8 +20,6 @@
 -export([compute_contract_terms/8]).
 -export([get_shop/4]).
 -export([compute_shop_terms/6]).
--export([compute_p2p_provider/5]).
--export([compute_withdrawal_provider/5]).
 -export([compute_payment_provider/5]).
 -export([compute_payment_provider_terminal_terms/6]).
 -export([compute_payment_institution_terms/5]).
@@ -69,14 +67,10 @@
 -type timestamp() :: dmsl_base_thrift:'Timestamp'().
 -type party_revision_param() :: dmsl_payment_processing_thrift:'PartyRevisionParam'().
 -type payout_params() :: dmsl_payment_processing_thrift:'PayoutParams'().
--type p2p_provider_ref() :: dmsl_domain_thrift:'P2PProviderRef'().
--type p2p_provider() :: dmsl_domain_thrift:'P2PProvider'().
--type withdrawal_provider_ref() :: dmsl_domain_thrift:'WithdrawalProviderRef'().
--type withdrawal_provider() :: dmsl_domain_thrift:'WithdrawalProvider'().
--type payment_provider_ref() :: dmsl_domain_thrift:'ProviderRef'().
--type payment_provider() :: dmsl_domain_thrift:'Provider'().
+-type provider_ref() :: dmsl_domain_thrift:'ProviderRef'().
+-type provider() :: dmsl_domain_thrift:'Provider'().
 -type terminal_ref() :: dmsl_domain_thrift:'TerminalRef'().
--type payment_provision_terms() :: dmsl_domain_thrift:'PaymentsProvisionTerms'().
+-type provision_term_set() :: dmsl_domain_thrift:'ProvisionTermSet'().
 -type payment_institution() :: dmsl_domain_thrift:'PaymentInstitution'().
 -type payment_institution_ref() :: dmsl_domain_thrift:'PaymentInstitutionRef'().
 -type varset() :: dmsl_payment_processing_thrift:'Varset'().
@@ -110,14 +104,10 @@
 -export_type([timestamp/0]).
 -export_type([party_revision_param/0]).
 -export_type([payout_params/0]).
--export_type([p2p_provider_ref/0]).
--export_type([p2p_provider/0]).
--export_type([withdrawal_provider_ref/0]).
--export_type([withdrawal_provider/0]).
--export_type([payment_provider_ref/0]).
--export_type([payment_provider/0]).
+-export_type([provider_ref/0]).
+-export_type([provider/0]).
 -export_type([terminal_ref/0]).
--export_type([payment_provision_terms/0]).
+-export_type([provision_term_set/0]).
 -export_type([payment_institution_ref/0]).
 -export_type([varset/0]).
 -export_type([terms/0]).
@@ -259,46 +249,26 @@ compute_contract_terms(PartyId, ContractId, Timestamp, PartyRevision, DomainRevi
     Args = [PartyId, ContractId, Timestamp, PartyRevision, DomainRevision, Varset],
     call('ComputeContractTerms', Args, Client, Context).
 
--spec compute_p2p_provider(Ref, Domain, Varset, client(), context()) ->
-    result(p2p_provider(), Error)
-    when
-    Ref :: p2p_provider_ref(),
-    Domain :: domain_revision(),
-    Varset :: varset(),
-    Error :: provider_not_found().
-compute_p2p_provider(Ref, Domain, Varset, Client, Context) ->
-    call('ComputeP2PProvider', [Ref, Domain, Varset], Client, Context).
-
--spec compute_withdrawal_provider(Ref, Domain, Varset, client(), context()) ->
-    result(withdrawal_provider(), Error)
-    when
-    Ref :: withdrawal_provider_ref(),
-    Domain :: domain_revision(),
-    Varset :: varset(),
-    Error :: provider_not_found().
-compute_withdrawal_provider(Ref, Domain, Varset, Client, Context) ->
-    call('ComputeWithdrawalProvider', [Ref, Domain, Varset], Client, Context).
-
 -spec compute_payment_provider(Ref, Domain, Varset, client(), context()) ->
-    result(payment_provider(), Error)
+    result(provider(), Error)
     when
-    Ref :: payment_provider_ref(),
+    Ref :: provider_ref(),
     Domain :: domain_revision(),
     Varset :: varset(),
     Error :: provider_not_found().
 compute_payment_provider(Ref, Domain, Varset, Client, Context) ->
-    call('ComputePaymentProvider', [Ref, Domain, Varset], Client, Context).
+    call('ComputeProvider', [Ref, Domain, Varset], Client, Context).
 
 -spec compute_payment_provider_terminal_terms(Ref, TerminalRef, Domain, Varset, client(), context()) ->
-    result(payment_provision_terms(), Error)
+    result(provision_term_set(), Error)
     when
-    Ref :: payment_provider_ref(),
+    Ref :: provider_ref(),
     TerminalRef :: terminal_ref(),
     Domain :: domain_revision(),
     Varset :: varset(),
     Error :: provider_not_found() | terminal_not_found().
 compute_payment_provider_terminal_terms(Ref, TerminalRef, Domain, Varset, Client, Context) ->
-    call('ComputePaymentProviderTerminalTerms', [Ref, TerminalRef, Domain, Varset], Client, Context).
+    call('ComputeProviderTerminalTerms', [Ref, TerminalRef, Domain, Varset], Client, Context).
 
 -spec compute_payment_institution_terms(party_id(), payment_institution_ref(), varset(), client(), context()) ->
     result(terms(), Error)
