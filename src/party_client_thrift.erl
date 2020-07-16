@@ -20,8 +20,8 @@
 -export([compute_contract_terms/8]).
 -export([get_shop/4]).
 -export([compute_shop_terms/6]).
--export([compute_payment_provider/5]).
--export([compute_payment_provider_terminal_terms/6]).
+-export([compute_provider/5]).
+-export([compute_provider_terminal_terms/6]).
 -export([compute_payment_institution_terms/5]).
 -export([compute_payment_institution/5]).
 -export([compute_payout_cash_flow/4]).
@@ -249,17 +249,17 @@ compute_contract_terms(PartyId, ContractId, Timestamp, PartyRevision, DomainRevi
     Args = [PartyId, ContractId, Timestamp, PartyRevision, DomainRevision, Varset],
     call('ComputeContractTerms', Args, Client, Context).
 
--spec compute_payment_provider(Ref, Domain, Varset, client(), context()) ->
+-spec compute_provider(Ref, Domain, Varset, client(), context()) ->
     result(provider(), Error)
     when
     Ref :: provider_ref(),
     Domain :: domain_revision(),
     Varset :: varset(),
     Error :: provider_not_found().
-compute_payment_provider(Ref, Domain, Varset, Client, Context) ->
+compute_provider(Ref, Domain, Varset, Client, Context) ->
     call('ComputeProvider', [Ref, Domain, Varset], Client, Context).
 
--spec compute_payment_provider_terminal_terms(Ref, TerminalRef, Domain, Varset, client(), context()) ->
+-spec compute_provider_terminal_terms(Ref, TerminalRef, Domain, Varset, client(), context()) ->
     result(provision_term_set(), Error)
     when
     Ref :: provider_ref(),
@@ -267,7 +267,7 @@ compute_payment_provider(Ref, Domain, Varset, Client, Context) ->
     Domain :: domain_revision(),
     Varset :: varset(),
     Error :: provider_not_found() | terminal_not_found().
-compute_payment_provider_terminal_terms(Ref, TerminalRef, Domain, Varset, Client, Context) ->
+compute_provider_terminal_terms(Ref, TerminalRef, Domain, Varset, Client, Context) ->
     call('ComputeProviderTerminalTerms', [Ref, TerminalRef, Domain, Varset], Client, Context).
 
 -spec compute_payment_institution_terms(party_id(), payment_institution_ref(), varset(), client(), context()) ->

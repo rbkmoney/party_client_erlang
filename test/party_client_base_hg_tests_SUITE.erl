@@ -296,14 +296,14 @@ compute_provider_ok(C) ->
                 cash_value = {value, ?cash(1000, <<"RUB">>)}
             }
         }
-    }} = party_client_thrift:compute_payment_provider(?prv(1), DomainRevision, Varset, Client, Context).
+    }} = party_client_thrift:compute_provider(?prv(1), DomainRevision, Varset, Client, Context).
 
 -spec compute_provider_not_found(config()) -> any().
 compute_provider_not_found(C) ->
     {ok, _PartyId, Client, Context} = test_init_info(C),
     {ok, DomainRevision} = dmt_client_cache:update(),
     {error, #payproc_ProviderNotFound{}} =
-        party_client_thrift:compute_payment_provider(
+        party_client_thrift:compute_provider(
             ?prv(2), DomainRevision, #payproc_Varset{}, Client, Context).
 
 -spec compute_provider_terminal_terms_ok(config()) -> any().
@@ -326,7 +326,7 @@ compute_provider_terminal_terms_ok(C) ->
         payments = #domain_PaymentsProvisionTerms{
             cash_flow = {value, [CashFlow]},
             payment_methods = {value, PaymentMethods}
-        }}} = party_client_thrift:compute_payment_provider_terminal_terms(
+        }}} = party_client_thrift:compute_provider_terminal_terms(
         ?prv(1), ?trm(1), DomainRevision, Varset, Client, Context).
 
 -spec compute_provider_terminal_terms_not_found(config()) -> any().
@@ -334,13 +334,13 @@ compute_provider_terminal_terms_not_found(C) ->
     {ok, _PartyId, Client, Context} = test_init_info(C),
     {ok, DomainRevision} = dmt_client_cache:update(),
     {error, #payproc_TerminalNotFound{}} =
-        party_client_thrift:compute_payment_provider_terminal_terms(
+        party_client_thrift:compute_provider_terminal_terms(
             ?prv(1), ?trm(2), DomainRevision, #payproc_Varset{}, Client, Context),
     {error, #payproc_ProviderNotFound{}} =
-        party_client_thrift:compute_payment_provider_terminal_terms(
+        party_client_thrift:compute_provider_terminal_terms(
             ?prv(2), ?trm(1), DomainRevision, #payproc_Varset{}, Client, Context),
     {error, #payproc_ProviderNotFound{}} =
-        party_client_thrift:compute_payment_provider_terminal_terms(
+        party_client_thrift:compute_provider_terminal_terms(
             ?prv(2), ?trm(2), DomainRevision, #payproc_Varset{}, Client, Context).
 
 %% Internal functions
