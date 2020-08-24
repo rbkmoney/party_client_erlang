@@ -419,7 +419,8 @@ get_events(PartyId, Range, Client, Context) ->
 call(Function, Args, Client, Context) ->
     UserInfo = party_client_context:get_user_info(Context),
     valid = validate_user_info(UserInfo),
-    party_client_woody:call(Function, [encode_user_info(UserInfo) | Args], Client, Context).
+    ArgsWithUserInfo = erlang:list_to_tuple([encode_user_info(UserInfo) | Args]),
+    party_client_woody:call(Function, ArgsWithUserInfo, Client, Context).
 
 -spec validate_user_info(party_client_context:user_info() | undefined) -> valid | no_return().
 validate_user_info(undefined = UserInfo) ->

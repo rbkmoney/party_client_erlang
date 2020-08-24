@@ -23,7 +23,7 @@ start_link(Client) ->
     WoodyOptions = party_client_config:get_woody_options(Client),
     woody_caching_client:start_link(WoodyOptions).
 
--spec call(atom(), [any()], client(), context()) ->
+-spec call(atom(), tuple(), client(), context()) ->
     ok | {ok, any()} | {error, business_error()} | no_return().
 call(Function, Args, Client, Context) ->
     Service = party_client_config:get_party_service(Client),
