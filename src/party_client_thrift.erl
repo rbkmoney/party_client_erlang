@@ -22,6 +22,8 @@
 -export([compute_shop_terms/6]).
 -export([compute_provider/5]).
 -export([compute_provider_terminal_terms/6]).
+-export([compute_globals/5]).
+-export([compute_payment_routing_ruleset/5]).
 -export([compute_payment_institution_terms/5]).
 -export([compute_payment_institution/5]).
 -export([compute_payout_cash_flow/4]).
@@ -71,6 +73,10 @@
 -type provider() :: dmsl_domain_thrift:'Provider'().
 -type terminal_ref() :: dmsl_domain_thrift:'TerminalRef'().
 -type provision_term_set() :: dmsl_domain_thrift:'ProvisionTermSet'().
+-type globals_ref() :: dmsl_domain_thrift:'GlobalsRef'().
+-type globals() :: dmsl_domain_thrift:'Globals'().
+-type payment_routing_ruleset_ref() :: dmsl_domain_thrift:'PaymentRoutingRulesetRef'().
+-type payment_routing_ruleset() :: dmsl_domain_thrift:'PaymentRoutingRuleset'().
 -type payment_institution() :: dmsl_domain_thrift:'PaymentInstitution'().
 -type payment_institution_ref() :: dmsl_domain_thrift:'PaymentInstitutionRef'().
 -type varset() :: dmsl_payment_processing_thrift:'Varset'().
@@ -108,6 +114,10 @@
 -export_type([provider/0]).
 -export_type([terminal_ref/0]).
 -export_type([provision_term_set/0]).
+-export_type([globals_ref/0]).
+-export_type([globals/0]).
+-export_type([payment_routing_ruleset_ref/0]).
+-export_type([payment_routing_ruleset/0]).
 -export_type([payment_institution_ref/0]).
 -export_type([varset/0]).
 -export_type([terms/0]).
@@ -143,6 +153,8 @@
 -type invalid_request() :: dmsl_base_thrift:'InvalidRequest'().
 -type provider_not_found() :: dmsl_payment_processing_thrift:'ProviderNotFound'().
 -type terminal_not_found() :: dmsl_payment_processing_thrift:'TerminalNotFound'().
+-type globals_not_found() :: dmsl_payment_processing_thrift:'GlobalsNotFound'().
+-type ruleset_not_found() :: dmsl_payment_processing_thrift:'RuleSetNotFound'().
 
 %% Client types
 
@@ -270,6 +282,26 @@ compute_provider(Ref, Domain, Varset, Client, Context) ->
 compute_provider_terminal_terms(Ref, TerminalRef, Domain, Varset, Client, Context) ->
     call('ComputeProviderTerminalTerms', [Ref, TerminalRef, Domain, Varset], Client, Context).
 
+-spec compute_globals(Ref, Domain, Varset, client(), context()) ->
+    result(globals(), Error)
+    when
+    Ref :: globals_ref(),
+    Domain :: domain_revision(),
+    Varset :: varset(),
+    Error :: globals_not_found().
+compute_globals(Ref, Domain, Varset, Client, Context) ->
+    call('ComputeGlobals', [Ref, Domain, Varset], Client, Context).
+
+-spec compute_payment_routing_ruleset(Ref, Domain, Varset, client(), context()) ->
+    result(payment_routing_ruleset(), Error)
+    when
+    Ref :: payment_routing_ruleset_ref(),
+    Domain :: domain_revision(),
+    Varset :: varset(),
+    Error :: ruleset_not_found().
+compute_payment_routing_ruleset(Ref, Domain, Varset, Client, Context) ->
+    call('ComputePaymentRoutingRuleset', [Ref, Domain, Varset], Client, Context).
+
 -spec compute_payment_institution_terms(party_id(), payment_institution_ref(), varset(), client(), context()) ->
     result(terms(), Error)
 when
@@ -387,7 +419,8 @@ get_events(PartyId, Range, Client, Context) ->
 call(Function, Args, Client, Context) ->
     UserInfo = party_client_context:get_user_info(Context),
     valid = validate_user_info(UserInfo),
-    party_client_woody:call(Function, [encode_user_info(UserInfo) | Args], Client, Context).
+    ArgsWithUserInfo = erlang:list_to_tuple([encode_user_info(UserInfo) | Args]),
+    party_client_woody:call(Function, ArgsWithUserInfo, Client, Context).
 
 -spec validate_user_info(party_client_context:user_info() | undefined) -> valid | no_return().
 validate_user_info(undefined = UserInfo) ->

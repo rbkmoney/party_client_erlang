@@ -28,12 +28,18 @@
 -export([compute_provider_not_found/1]).
 -export([compute_provider_terminal_terms_ok/1]).
 -export([compute_provider_terminal_terms_not_found/1]).
+-export([compute_globals_ok/1]).
+-export([compute_payment_routing_ruleset_ok/1]).
+-export([compute_payment_routing_ruleset_unreducable/1]).
+-export([compute_payment_routing_ruleset_not_found/1]).
 
 %% Internal types
 
 -type test_entry() :: atom() | {group, atom()}.
 -type group() :: {atom(), [Opts :: atom()], [test_entry()]}.
 -type config() :: [{atom(), any()}].
+
+-define(WRONG_DMT_OBJ_ID, 99999).
 
 %% CT description
 
@@ -62,7 +68,11 @@ groups() ->
             compute_provider_ok,
             compute_provider_not_found,
             compute_provider_terminal_terms_ok,
-            compute_provider_terminal_terms_not_found
+            compute_provider_terminal_terms_not_found,
+            compute_globals_ok,
+            compute_payment_routing_ruleset_ok,
+            compute_payment_routing_ruleset_unreducable,
+            compute_payment_routing_ruleset_not_found
         ]}
     ].
 
@@ -321,7 +331,7 @@ compute_provider_terminal_terms_ok(C) ->
             ?share(5, 100, operation_amount, round_half_towards_zero)
         ])}}
     ),
-    PaymentMethods = ?ordset([?pmt(bank_card, visa)]),
+    PaymentMethods = ?ordset([?pmt(bank_card_deprecated, visa)]),
     {ok, #domain_ProvisionTermSet{
         payments = #domain_PaymentsProvisionTerms{
             cash_flow = {value, [CashFlow]},
@@ -335,13 +345,78 @@ compute_provider_terminal_terms_not_found(C) ->
     {ok, DomainRevision} = dmt_client_cache:update(),
     {error, #payproc_TerminalNotFound{}} =
         party_client_thrift:compute_provider_terminal_terms(
-            ?prv(1), ?trm(2), DomainRevision, #payproc_Varset{}, Client, Context),
+            ?prv(1), ?trm(?WRONG_DMT_OBJ_ID), DomainRevision, #payproc_Varset{}, Client, Context),
     {error, #payproc_ProviderNotFound{}} =
         party_client_thrift:compute_provider_terminal_terms(
             ?prv(2), ?trm(1), DomainRevision, #payproc_Varset{}, Client, Context),
     {error, #payproc_ProviderNotFound{}} =
         party_client_thrift:compute_provider_terminal_terms(
-            ?prv(2), ?trm(2), DomainRevision, #payproc_Varset{}, Client, Context).
+            ?prv(2), ?trm(?WRONG_DMT_OBJ_ID), DomainRevision, #payproc_Varset{}, Client, Context).
+
+-spec compute_globals_ok(config()) -> any().
+compute_globals_ok(C) ->
+    {ok, _PartyId, Client, Context} = test_init_info(C),
+    {ok, DomainRevision} = dmt_client_cache:update(),
+    Varset = #payproc_Varset{},
+    {ok, #domain_Globals{
+        external_account_set = {value, ?eas(1)}
+    }} = party_client_thrift:compute_globals(#domain_GlobalsRef{}, DomainRevision, Varset, Client, Context).
+
+-spec compute_payment_routing_ruleset_ok(config()) -> any().
+compute_payment_routing_ruleset_ok(C) ->
+    {ok, _PartyId, Client, Context} = test_init_info(C),
+    {ok, DomainRevision} = dmt_client_cache:update(),
+    Varset = #payproc_Varset{
+        party_id = <<"67890">>
+    },
+    {ok, #domain_PaymentRoutingRuleset{
+        name = <<"Rule#1">>,
+        decisions = {candidates, [
+            #domain_PaymentRoutingCandidate{
+                terminal = ?trm(2),
+                allowed = {constant, true}
+            },
+            #domain_PaymentRoutingCandidate{
+                terminal = ?trm(3),
+                allowed = {constant, true}
+            },
+            #domain_PaymentRoutingCandidate{
+                terminal = ?trm(1),
+                allowed = {constant, true}
+            }
+        ]}
+    }} = party_client_thrift:compute_payment_routing_ruleset(?ruleset(1), DomainRevision, Varset, Client, Context).
+
+-spec compute_payment_routing_ruleset_unreducable(config()) -> any().
+compute_payment_routing_ruleset_unreducable(C) ->
+    {ok, _PartyId, Client, Context} = test_init_info(C),
+    {ok, DomainRevision} = dmt_client_cache:update(),
+    Varset = #payproc_Varset{},
+    {ok, #domain_PaymentRoutingRuleset{
+        name = <<"Rule#1">>,
+        decisions = {delegates, [
+            #domain_PaymentRoutingDelegate{
+                allowed = {condition, {party, #domain_PartyCondition{id = <<"12345">>}}},
+                ruleset = ?ruleset(2)
+            },
+            #domain_PaymentRoutingDelegate{
+                allowed = {condition, {party, #domain_PartyCondition{id = <<"67890">>}}},
+                ruleset = ?ruleset(3)
+            },
+            #domain_PaymentRoutingDelegate{
+                allowed = {constant, true},
+                ruleset = ?ruleset(4)
+            }
+        ]}
+    }} = party_client_thrift:compute_payment_routing_ruleset(?ruleset(1), DomainRevision, Varset, Client, Context).
+
+-spec compute_payment_routing_ruleset_not_found(config()) -> any().
+compute_payment_routing_ruleset_not_found(C) ->
+    {ok, _PartyId, Client, Context} = test_init_info(C),
+    {ok, DomainRevision} = dmt_client_cache:update(),
+    {error, #payproc_RuleSetNotFound{}} =
+        (catch party_client_thrift:compute_payment_routing_ruleset(
+            ?ruleset(5), DomainRevision, #payproc_Varset{}, Client, Context)).
 
 %% Internal functions
 

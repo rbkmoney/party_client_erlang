@@ -33,6 +33,6 @@ build('party_client_erlang', 'docker-host', finalHook) {
     pipeErlangLib = load("${env.JENKINS_LIB}/pipeErlangLib.groovy")
   }
 
-  pipeErlangLib.runPipe(true,true)
+  pipeErlangLib.runPipe(true,false)
 }
 

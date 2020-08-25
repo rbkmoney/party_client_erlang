@@ -18,6 +18,7 @@
 -type template()    :: dmsl_domain_thrift:'ContractTemplateRef'().
 -type terms()       :: dmsl_domain_thrift:'TermSetHierarchyRef'().
 -type lifetime()    :: dmsl_domain_thrift:'Lifetime'() | undefined.
+-type payment_routing_ruleset() :: dmsl_domain_thrift:'PaymentRoutingRulesetRef'().
 
 -type system_account_set() :: dmsl_domain_thrift:'SystemAccountSetRef'().
 -type external_account_set() :: dmsl_domain_thrift:'ExternalAccountSetRef'().
@@ -65,7 +66,7 @@ construct_domain_fixture() ->
                 ?cat(3)
             ])},
             payment_methods = {value, ordsets:from_list([
-                ?pmt(bank_card, visa)
+                ?pmt(bank_card_deprecated, visa)
             ])}
         }
     },
@@ -107,6 +108,46 @@ construct_domain_fixture() ->
             currencies = {value, ordsets:from_list([?cur(<<"RUB">>)])}
         }
     },
+    Decision1 = {delegates, [
+        #domain_PaymentRoutingDelegate{
+            allowed = {condition, {party, #domain_PartyCondition{id = <<"12345">>}}},
+            ruleset = ?ruleset(2)
+        },
+        #domain_PaymentRoutingDelegate{
+            allowed = {condition, {party, #domain_PartyCondition{id = <<"67890">>}}},
+            ruleset = ?ruleset(3)
+        },
+        #domain_PaymentRoutingDelegate{
+            allowed = {constant, true},
+            ruleset = ?ruleset(4)
+        }
+    ]},
+    Decision2 = {candidates, [
+        #domain_PaymentRoutingCandidate{
+            allowed = {constant, true},
+            terminal = ?trm(1)
+        }
+    ]},
+    Decision3 = {candidates, [
+        #domain_PaymentRoutingCandidate{
+            allowed = {condition, {party, #domain_PartyCondition{id = <<"67890">>}}},
+            terminal = ?trm(2)
+        },
+        #domain_PaymentRoutingCandidate{
+            allowed = {constant, true},
+            terminal = ?trm(3)
+        },
+        #domain_PaymentRoutingCandidate{
+            allowed = {constant, true},
+            terminal = ?trm(1)
+        }
+    ]},
+    Decision4 = {candidates, [
+        #domain_PaymentRoutingCandidate{
+            allowed = {constant, true},
+            terminal = ?trm(3)
+        }
+    ]},
     [
         construct_currency(?cur(<<"RUB">>)),
         construct_currency(?cur(<<"USD">>)),
@@ -115,9 +156,9 @@ construct_domain_fixture() ->
         construct_category(?cat(2), <<"Generic Store">>, live),
         construct_category(?cat(3), <<"Guns & Booze">>, live),
 
-        construct_payment_method(?pmt(bank_card, visa)),
-        construct_payment_method(?pmt(bank_card, mastercard)),
-        construct_payment_method(?pmt(bank_card, maestro)),
+        construct_payment_method(?pmt(bank_card_deprecated, visa)),
+        construct_payment_method(?pmt(bank_card_deprecated, mastercard)),
+        construct_payment_method(?pmt(bank_card_deprecated, maestro)),
         construct_payment_method(?pmt(payment_terminal, euroset)),
 
         construct_payout_method(?pomt(russian_bank_account)),
@@ -130,6 +171,11 @@ construct_domain_fixture() ->
         construct_external_account_set(?eas(1)),
 
         construct_business_schedule(?bussched(1)),
+
+        construct_payment_routing_ruleset(?ruleset(1), <<"Rule#1">>, Decision1),
+        construct_payment_routing_ruleset(?ruleset(2), <<"Rule#2">>, Decision2),
+        construct_payment_routing_ruleset(?ruleset(3), <<"Rule#3">>, Decision3),
+        construct_payment_routing_ruleset(?ruleset(4), <<"Rule#4">>, Decision4),
 
         {payment_institution, #domain_PaymentInstitutionObject{
             ref = ?pinst(1),
@@ -233,7 +279,7 @@ construct_domain_fixture() ->
                                 ?cat(2)
                             ])},
                             payment_methods = {value, ordsets:from_list([
-                                ?pmt(bank_card, visa)
+                                ?pmt(bank_card_deprecated, visa)
                             ])}
                         }
                     }
@@ -253,8 +299,8 @@ construct_domain_fixture() ->
                         currencies = {value, ?ordset([?cur(<<"RUB">>)])},
                         categories = {value, ?ordset([?cat(1)])},
                         payment_methods = {value, ?ordset([
-                            ?pmt(bank_card, visa),
-                            ?pmt(bank_card, mastercard)
+                            ?pmt(bank_card_deprecated, visa),
+                            ?pmt(bank_card_deprecated, mastercard)
                         ])},
                         cash_limit = {value, ?cashrng(
                             {inclusive, ?cash(      1000, <<"RUB">>)},
@@ -296,8 +342,8 @@ construct_domain_fixture() ->
                     recurrent_paytools = #domain_RecurrentPaytoolsProvisionTerms{
                         categories = {value, ?ordset([?cat(1)])},
                         payment_methods = {value, ?ordset([
-                            ?pmt(bank_card, visa),
-                            ?pmt(bank_card, mastercard)
+                            ?pmt(bank_card_deprecated, visa),
+                            ?pmt(bank_card_deprecated, mastercard)
                         ])},
                         cash_value = {decisions, [
                             #domain_CashValueDecision{
@@ -322,7 +368,35 @@ construct_domain_fixture() ->
                 terms = #domain_ProvisionTermSet{
                     payments = #domain_PaymentsProvisionTerms{
                         payment_methods = {value, ?ordset([
-                            ?pmt(bank_card, visa)
+                            ?pmt(bank_card_deprecated, visa)
+                        ])}
+                    }
+                }
+            }
+        }},
+        {terminal, #domain_TerminalObject{
+            ref = ?trm(2),
+            data = #domain_Terminal{
+                name = <<"Brominal 2">>,
+                description = <<"Brominal 2">>,
+                terms = #domain_ProvisionTermSet{
+                    payments = #domain_PaymentsProvisionTerms{
+                        payment_methods = {value, ?ordset([
+                            ?pmt(bank_card_deprecated, visa)
+                        ])}
+                    }
+                }
+            }
+        }},
+        {terminal, #domain_TerminalObject{
+            ref = ?trm(3),
+            data = #domain_Terminal{
+                name = <<"Brominal 3">>,
+                description = <<"Brominal 3">>,
+                terms = #domain_ProvisionTermSet{
+                    payments = #domain_PaymentsProvisionTerms{
+                        payment_methods = {value, ?ordset([
+                            ?pmt(bank_card_deprecated, visa)
                         ])}
                     }
                 }
@@ -504,5 +578,17 @@ construct_business_schedule(Ref) ->
                 minute = {on, [40]},
                 second = {on, [0]}
             }
+        }
+    }}.
+
+-spec construct_payment_routing_ruleset(payment_routing_ruleset(), name(), _) ->
+    dmsl_domain_thrift:'PaymentRoutingRulesetObject'().
+
+construct_payment_routing_ruleset(Ref, Name, Decisions) ->
+    {payment_routing_rules, #domain_PaymentRoutingRulesObject{
+        ref = Ref,
+        data = #domain_PaymentRoutingRuleset{
+            name = Name,
+            decisions = Decisions
         }
     }}.
