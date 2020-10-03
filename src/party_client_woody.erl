@@ -55,10 +55,16 @@ get_cache_control(Function, Client) ->
     end.
 
 -spec get_safe_cache_control(atom()) -> woody_caching_client:cache_control().
-get_safe_cache_control('Checkout') ->
-    cache;
-get_safe_cache_control(_Other) ->
-    no_cache.
+get_safe_cache_control('Checkout') -> cache;
+get_safe_cache_control('ComputeContractTerms') -> cache;
+get_safe_cache_control('ComputeShopTerms') -> cache;
+get_safe_cache_control('ComputeProvider') -> cache;
+get_safe_cache_control('ComputeProviderTerminalTerms') -> cache;
+get_safe_cache_control('ComputeGlobals') -> cache;
+get_safe_cache_control('ComputePaymentRoutingRuleset') -> cache;
+get_safe_cache_control('ComputePaymentInstitutionTerms') -> cache;
+get_safe_cache_control('ComputePaymentInstitution') -> cache;
+get_safe_cache_control(_Other) -> no_cache.
 
 -spec get_aggressive_cache_control(atom(), timeout()) -> woody_caching_client:cache_control().
 get_aggressive_cache_control(Function, Timeout) ->
@@ -81,6 +87,13 @@ get_aggressive_function_cache_mode('GetClaim') -> temporary;
 get_aggressive_function_cache_mode('GetClaims') -> temporary;
 get_aggressive_function_cache_mode('GetEvents') -> temporary;
 get_aggressive_function_cache_mode('GetShopAccount') -> temporary;
-get_aggressive_function_cache_mode('ComputePaymentInstitutionTerms') -> temporary;
+get_aggressive_function_cache_mode('ComputeContractTerms') -> cache;
+get_aggressive_function_cache_mode('ComputeShopTerms') -> cache;
+get_aggressive_function_cache_mode('ComputeProvider') -> cache;
+get_aggressive_function_cache_mode('ComputeProviderTerminalTerms') -> cache;
+get_aggressive_function_cache_mode('ComputeGlobals') -> cache;
+get_aggressive_function_cache_mode('ComputePaymentRoutingRuleset') -> cache;
+get_aggressive_function_cache_mode('ComputePaymentInstitutionTerms') -> cache;
+get_aggressive_function_cache_mode('ComputePaymentInstitution') -> cache;
 get_aggressive_function_cache_mode('ComputePayoutCashFlow') -> temporary;
 get_aggressive_function_cache_mode(_Other) -> no_cache.
