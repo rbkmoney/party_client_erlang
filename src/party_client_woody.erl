@@ -81,7 +81,6 @@ get_aggressive_function_cache_mode('Checkout') -> cache;
 get_aggressive_function_cache_mode('Get' ) -> temporary;
 get_aggressive_function_cache_mode('GetRevision') -> temporary;
 get_aggressive_function_cache_mode('GetContract') -> temporary;
-get_aggressive_function_cache_mode('ComputeContractTerms') -> temporary;
 get_aggressive_function_cache_mode('GetShop') -> temporary;
 get_aggressive_function_cache_mode('GetClaim') -> temporary;
 get_aggressive_function_cache_mode('GetClaims') -> temporary;
