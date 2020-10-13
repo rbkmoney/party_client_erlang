@@ -1,6 +1,7 @@
 -module(party_client_base_hg_tests_SUITE).
 
 -include("party_domain_fixtures.hrl").
+
 -include_lib("damsel/include/dmsl_domain_config_thrift.hrl").
 -include_lib("damsel/include/dmsl_payment_processing_thrift.hrl").
 -include_lib("common_test/include/ct.hrl").
@@ -83,10 +84,12 @@ init_per_suite(Config) ->
     % _ = dbg:tpl({'scoper_woody_event_handler', 'handle_event', '_'}, x),
     AppConfig = [
         {dmt_client, [
-            {cache_update_interval, 5000}, % milliseconds
+            % milliseconds
+            {cache_update_interval, 5000},
             {max_cache_size, #{
                 elements => 1,
-                memory => 2048 % 2Kb
+                % 2Kb
+                memory => 2048
             }},
             {service_urls, #{
                 'Repository' => <<"http://dominant:8022/v1/domain/repository">>,
@@ -292,10 +295,12 @@ compute_provider_ok(C) ->
     CashFlow = ?cfpost(
         {system, settlement},
         {provider, settlement},
-        {product, {min_of, ?ordset([
-            ?fixed(10, <<"RUB">>),
-            ?share(5, 100, operation_amount, round_half_towards_zero)
-        ])}}
+        {product,
+            {min_of,
+                ?ordset([
+                    ?fixed(10, <<"RUB">>),
+                    ?share(5, 100, operation_amount, round_half_towards_zero)
+                ])}}
     ),
     {ok, #domain_Provider{
         terms = #domain_ProvisionTermSet{
@@ -314,7 +319,12 @@ compute_provider_not_found(C) ->
     {ok, DomainRevision} = dmt_client_cache:update(),
     {error, #payproc_ProviderNotFound{}} =
         party_client_thrift:compute_provider(
-            ?prv(2), DomainRevision, #payproc_Varset{}, Client, Context).
+            ?prv(2),
+            DomainRevision,
+            #payproc_Varset{},
+            Client,
+            Context
+        ).
 
 -spec compute_provider_terminal_terms_ok(config()) -> any().
 compute_provider_terminal_terms_ok(C) ->
@@ -326,18 +336,27 @@ compute_provider_terminal_terms_ok(C) ->
     CashFlow = ?cfpost(
         {system, settlement},
         {provider, settlement},
-        {product, {min_of, ?ordset([
-            ?fixed(10, <<"RUB">>),
-            ?share(5, 100, operation_amount, round_half_towards_zero)
-        ])}}
+        {product,
+            {min_of,
+                ?ordset([
+                    ?fixed(10, <<"RUB">>),
+                    ?share(5, 100, operation_amount, round_half_towards_zero)
+                ])}}
     ),
     PaymentMethods = ?ordset([?pmt(bank_card_deprecated, visa)]),
     {ok, #domain_ProvisionTermSet{
         payments = #domain_PaymentsProvisionTerms{
             cash_flow = {value, [CashFlow]},
             payment_methods = {value, PaymentMethods}
-        }}} = party_client_thrift:compute_provider_terminal_terms(
-        ?prv(1), ?trm(1), DomainRevision, Varset, Client, Context).
+        }
+    }} = party_client_thrift:compute_provider_terminal_terms(
+        ?prv(1),
+        ?trm(1),
+        DomainRevision,
+        Varset,
+        Client,
+        Context
+    ).
 
 -spec compute_provider_terminal_terms_not_found(config()) -> any().
 compute_provider_terminal_terms_not_found(C) ->
@@ -345,13 +364,31 @@ compute_provider_terminal_terms_not_found(C) ->
     {ok, DomainRevision} = dmt_client_cache:update(),
     {error, #payproc_TerminalNotFound{}} =
         party_client_thrift:compute_provider_terminal_terms(
-            ?prv(1), ?trm(?WRONG_DMT_OBJ_ID), DomainRevision, #payproc_Varset{}, Client, Context),
+            ?prv(1),
+            ?trm(?WRONG_DMT_OBJ_ID),
+            DomainRevision,
+            #payproc_Varset{},
+            Client,
+            Context
+        ),
     {error, #payproc_ProviderNotFound{}} =
         party_client_thrift:compute_provider_terminal_terms(
-            ?prv(2), ?trm(1), DomainRevision, #payproc_Varset{}, Client, Context),
+            ?prv(2),
+            ?trm(1),
+            DomainRevision,
+            #payproc_Varset{},
+            Client,
+            Context
+        ),
     {error, #payproc_ProviderNotFound{}} =
         party_client_thrift:compute_provider_terminal_terms(
-            ?prv(2), ?trm(?WRONG_DMT_OBJ_ID), DomainRevision, #payproc_Varset{}, Client, Context).
+            ?prv(2),
+            ?trm(?WRONG_DMT_OBJ_ID),
+            DomainRevision,
+            #payproc_Varset{},
+            Client,
+            Context
+        ).
 
 -spec compute_globals_ok(config()) -> any().
 compute_globals_ok(C) ->
@@ -371,20 +408,21 @@ compute_payment_routing_ruleset_ok(C) ->
     },
     {ok, #domain_PaymentRoutingRuleset{
         name = <<"Rule#1">>,
-        decisions = {candidates, [
-            #domain_PaymentRoutingCandidate{
-                terminal = ?trm(2),
-                allowed = {constant, true}
-            },
-            #domain_PaymentRoutingCandidate{
-                terminal = ?trm(3),
-                allowed = {constant, true}
-            },
-            #domain_PaymentRoutingCandidate{
-                terminal = ?trm(1),
-                allowed = {constant, true}
-            }
-        ]}
+        decisions =
+            {candidates, [
+                #domain_PaymentRoutingCandidate{
+                    terminal = ?trm(2),
+                    allowed = {constant, true}
+                },
+                #domain_PaymentRoutingCandidate{
+                    terminal = ?trm(3),
+                    allowed = {constant, true}
+                },
+                #domain_PaymentRoutingCandidate{
+                    terminal = ?trm(1),
+                    allowed = {constant, true}
+                }
+            ]}
     }} = party_client_thrift:compute_payment_routing_ruleset(?ruleset(1), DomainRevision, Varset, Client, Context).
 
 -spec compute_payment_routing_ruleset_unreducable(config()) -> any().
@@ -394,20 +432,21 @@ compute_payment_routing_ruleset_unreducable(C) ->
     Varset = #payproc_Varset{},
     {ok, #domain_PaymentRoutingRuleset{
         name = <<"Rule#1">>,
-        decisions = {delegates, [
-            #domain_PaymentRoutingDelegate{
-                allowed = {condition, {party, #domain_PartyCondition{id = <<"12345">>}}},
-                ruleset = ?ruleset(2)
-            },
-            #domain_PaymentRoutingDelegate{
-                allowed = {condition, {party, #domain_PartyCondition{id = <<"67890">>}}},
-                ruleset = ?ruleset(3)
-            },
-            #domain_PaymentRoutingDelegate{
-                allowed = {constant, true},
-                ruleset = ?ruleset(4)
-            }
-        ]}
+        decisions =
+            {delegates, [
+                #domain_PaymentRoutingDelegate{
+                    allowed = {condition, {party, #domain_PartyCondition{id = <<"12345">>}}},
+                    ruleset = ?ruleset(2)
+                },
+                #domain_PaymentRoutingDelegate{
+                    allowed = {condition, {party, #domain_PartyCondition{id = <<"67890">>}}},
+                    ruleset = ?ruleset(3)
+                },
+                #domain_PaymentRoutingDelegate{
+                    allowed = {constant, true},
+                    ruleset = ?ruleset(4)
+                }
+            ]}
     }} = party_client_thrift:compute_payment_routing_ruleset(?ruleset(1), DomainRevision, Varset, Client, Context).
 
 -spec compute_payment_routing_ruleset_not_found(config()) -> any().
@@ -416,7 +455,12 @@ compute_payment_routing_ruleset_not_found(C) ->
     {ok, DomainRevision} = dmt_client_cache:update(),
     {error, #payproc_RuleSetNotFound{}} =
         (catch party_client_thrift:compute_payment_routing_ruleset(
-            ?ruleset(5), DomainRevision, #payproc_Varset{}, Client, Context)).
+            ?ruleset(5),
+            DomainRevision,
+            #payproc_Varset{},
+            Client,
+            Context
+        )).
 
 %% Internal functions
 
@@ -428,7 +472,8 @@ init_domain() ->
     ok = party_domain_fixtures:cleanup(),
     {ok, _} = dmt_client_cache:update(),
     ok = party_domain_fixtures:apply_domain_fixture(),
-    timer:sleep(5000),  % Wait until hellgate dmt_client cache updating
+    % Wait until hellgate dmt_client cache updating
+    timer:sleep(5000),
     {ok, _Revision} = dmt_client_cache:update().
 
 create_party(C) ->
@@ -454,10 +499,11 @@ create_contract(PartyId, C) ->
         }},
         {contract_modification, #payproc_ContractModificationUnit{
             id = ContractId,
-            modification = {payout_tool_modification, #payproc_PayoutToolModificationUnit{
-                payout_tool_id = <<"1">>,
-                modification = {creation, PayoutToolParams}
-            }}
+            modification =
+                {payout_tool_modification, #payproc_PayoutToolModificationUnit{
+                    payout_tool_id = <<"1">>,
+                    modification = {creation, PayoutToolParams}
+                }}
         }}
     ],
     create_and_accept_claim(PartyId, Changeset, Client, Context),
@@ -474,7 +520,7 @@ create_shop(PartyId, ContractId, C) ->
     Params = #payproc_ShopParams{
         category = #domain_CategoryRef{id = 2},
         location = {url, <<"https://somename.somedomain/p/123?redirect=1">>},
-        details  = Details,
+        details = Details,
         contract_id = ContractId,
         payout_tool_id = get_first_payout_tool_id(PartyId, ContractId, Client, Context)
     },
@@ -525,8 +571,7 @@ test_init_info(C) ->
     Context = create_context(),
     {ok, PartyId, Client, Context}.
 
--spec make_battle_ready_contractor() ->
-    dmsl_payment_processing_thrift:'Contractor'().
+-spec make_battle_ready_contractor() -> dmsl_payment_processing_thrift:'Contractor'().
 make_battle_ready_contractor() ->
     BankAccount = #domain_RussianBankAccount{
         account = <<"4276300010908312893">>,
@@ -535,7 +580,7 @@ make_battle_ready_contractor() ->
         bank_bik = <<"66642666">>
     },
     {legal_entity,
-        {russian_legal_entity, #domain_RussianLegalEntity {
+        {russian_legal_entity, #domain_RussianLegalEntity{
             registered_name = <<"Hoofs & Horns OJSC">>,
             registered_number = <<"1234509876">>,
             inn = <<"1213456789012">>,
@@ -545,20 +590,19 @@ make_battle_ready_contractor() ->
             representative_full_name = <<"Someone">>,
             representative_document = <<"100$ banknote">>,
             russian_bank_account = BankAccount
-        }}
-    }.
+        }}}.
 
--spec make_battle_ready_payout_tool_params() ->
-    dmsl_payment_processing_thrift:'PayoutToolParams'().
+-spec make_battle_ready_payout_tool_params() -> dmsl_payment_processing_thrift:'PayoutToolParams'().
 make_battle_ready_payout_tool_params() ->
     #payproc_PayoutToolParams{
         currency = #domain_CurrencyRef{symbolic_code = <<"RUB">>},
-        tool_info = {russian_bank_account, #domain_RussianBankAccount{
-            account = <<"4276300010908312893">>,
-            bank_name = <<"SomeBank">>,
-            bank_post_account = <<"123129876">>,
-            bank_bik = <<"66642666">>
-        }}
+        tool_info =
+            {russian_bank_account, #domain_RussianBankAccount{
+                account = <<"4276300010908312893">>,
+                bank_name = <<"SomeBank">>,
+                bank_post_account = <<"123129876">>,
+                bank_bik = <<"66642666">>
+            }}
     }.
 
 %% Other helpers

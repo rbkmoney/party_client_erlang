@@ -8,11 +8,13 @@
 -export([get_woody_options/1]).
 
 -opaque client() :: options().
+
 -type options() :: #{
     party_service => woody_service(),
     aggressive_caching_timeout => timeout(),
     woody_options => map()
 }.
+
 -type cache_mode() :: disabled | safe | aggressive.
 
 -export_type([client/0]).
@@ -65,11 +67,11 @@ get_woody_transport_opts(_Client) ->
 -spec get_woody_options(client()) -> woody_options().
 get_woody_options(Client) ->
     DefaultOptions = #{
-        cache        => #{local_name => ?DEFAULT_CACHE_NAME},
+        cache => #{local_name => ?DEFAULT_CACHE_NAME},
         workers_name => ?DEFAULT_WORKERS_NAME,
         woody_client => #{
-            url            => get_default([services, party_management]),
-            event_handler  => woody_event_handler_default,
+            url => get_default([services, party_management]),
+            event_handler => woody_event_handler_default,
             transport_opts => #{}
         }
     },
@@ -108,12 +110,13 @@ merge_nested_maps(Map1, Map2) ->
     maps:fold(fun merge_map_item/3, Map1, Map2).
 
 merge_map_item(K, V, Acc) when is_map(V) ->
-    NewV = case maps:is_key(K, Acc) of
-        true ->
-            merge_nested_maps(maps:get(K, Acc), V);
-        false ->
-            V
-    end,
+    NewV =
+        case maps:is_key(K, Acc) of
+            true ->
+                merge_nested_maps(maps:get(K, Acc), V);
+            false ->
+                V
+        end,
     Acc#{K => NewV};
 merge_map_item(K, V, Acc) ->
     Acc#{K => V}.

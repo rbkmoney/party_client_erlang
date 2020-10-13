@@ -11,10 +11,12 @@
     woody_context := woody_context(),
     user_info => user_info()
 }.
+
 -type options() :: #{
     woody_context => woody_context(),
     user_info => user_info()
 }.
+
 -type user_info() :: woody_user_identity:user_identity().
 
 -export_type([context/0]).

@@ -1,6 +1,7 @@
 -module(party_domain_fixtures).
 
 -include("party_domain_fixtures.hrl").
+
 -include_lib("damsel/include/dmsl_domain_config_thrift.hrl").
 
 -export([construct_domain_fixture/0]).
@@ -10,14 +11,14 @@
 
 %% Internal types
 
--type name()        :: binary().
--type category()    :: dmsl_domain_thrift:'CategoryRef'().
--type currency()    :: dmsl_domain_thrift:'CurrencyRef'().
--type proxy()       :: dmsl_domain_thrift:'ProxyRef'().
--type inspector()   :: dmsl_domain_thrift:'InspectorRef'().
--type template()    :: dmsl_domain_thrift:'ContractTemplateRef'().
--type terms()       :: dmsl_domain_thrift:'TermSetHierarchyRef'().
--type lifetime()    :: dmsl_domain_thrift:'Lifetime'() | undefined.
+-type name() :: binary().
+-type category() :: dmsl_domain_thrift:'CategoryRef'().
+-type currency() :: dmsl_domain_thrift:'CurrencyRef'().
+-type proxy() :: dmsl_domain_thrift:'ProxyRef'().
+-type inspector() :: dmsl_domain_thrift:'InspectorRef'().
+-type template() :: dmsl_domain_thrift:'ContractTemplateRef'().
+-type terms() :: dmsl_domain_thrift:'TermSetHierarchyRef'().
+-type lifetime() :: dmsl_domain_thrift:'Lifetime'() | undefined.
 -type payment_routing_ruleset() :: dmsl_domain_thrift:'PaymentRoutingRulesetRef'().
 
 -type system_account_set() :: dmsl_domain_thrift:'SystemAccountSetRef'().
@@ -35,7 +36,7 @@ apply_domain_fixture() ->
 apply_domain_fixture(Fixture) ->
     #'Snapshot'{version = Head} = dmt_client:checkout({head, #'Head'{}}),
     Commit = #'Commit'{ops = [{insert, #'InsertOp'{object = F}} || F <- Fixture]},
-%%    logger:error("Fixture: ~p~nCommit: ~p", [Fixture, Commit]),
+    %%    logger:error("Fixture: ~p~nCommit: ~p", [Fixture, Commit]),
     _NextRevision = dmt_client:commit(Head, Commit),
     ok.
 
@@ -57,97 +58,111 @@ construct_domain_fixture() ->
     },
     DefaultTermSet = #domain_TermSet{
         payments = #domain_PaymentsServiceTerms{
-            currencies = {value, ordsets:from_list([
-                ?cur(<<"RUB">>),
-                ?cur(<<"USD">>)
-            ])},
-            categories = {value, ordsets:from_list([
-                ?cat(2),
-                ?cat(3)
-            ])},
-            payment_methods = {value, ordsets:from_list([
-                ?pmt(bank_card_deprecated, visa)
-            ])}
+            currencies =
+                {value,
+                    ordsets:from_list([
+                        ?cur(<<"RUB">>),
+                        ?cur(<<"USD">>)
+                    ])},
+            categories =
+                {value,
+                    ordsets:from_list([
+                        ?cat(2),
+                        ?cat(3)
+                    ])},
+            payment_methods =
+                {value,
+                    ordsets:from_list([
+                        ?pmt(bank_card_deprecated, visa)
+                    ])}
         }
     },
     TermSet = #domain_TermSet{
         payments = #domain_PaymentsServiceTerms{
-            cash_limit = {value, #domain_CashRange{
-                lower = {inclusive, #domain_Cash{amount = 1000, currency = ?cur(<<"RUB">>)}},
-                upper = {exclusive, #domain_Cash{amount = 4200000, currency = ?cur(<<"RUB">>)}}
-            }},
-            fees = {value, [
-                ?cfpost(
-                    {merchant, settlement},
-                    {system, settlement},
-                    ?share(45, 1000, operation_amount)
-                )
-            ]}
+            cash_limit =
+                {value, #domain_CashRange{
+                    lower = {inclusive, #domain_Cash{amount = 1000, currency = ?cur(<<"RUB">>)}},
+                    upper = {exclusive, #domain_Cash{amount = 4200000, currency = ?cur(<<"RUB">>)}}
+                }},
+            fees =
+                {value, [
+                    ?cfpost(
+                        {merchant, settlement},
+                        {system, settlement},
+                        ?share(45, 1000, operation_amount)
+                    )
+                ]}
         },
         payouts = #domain_PayoutsServiceTerms{
-            payout_methods = {decisions, [
-                #domain_PayoutMethodDecision{
-                    if_   = {constant, true},
-                    then_ = {value, ordsets:from_list([?pomt(russian_bank_account)])}
-                }
-            ]},
-            fees = {value, [
-                ?cfpost(
-                    {merchant, settlement},
-                    {merchant, payout},
-                    ?share(750, 1000, operation_amount)
-                ),
-                ?cfpost(
-                    {merchant, settlement},
-                    {system, settlement},
-                    ?share(250, 1000, operation_amount)
-                )
-            ]}
+            payout_methods =
+                {decisions, [
+                    #domain_PayoutMethodDecision{
+                        if_ = {constant, true},
+                        then_ = {value, ordsets:from_list([?pomt(russian_bank_account)])}
+                    }
+                ]},
+            fees =
+                {value, [
+                    ?cfpost(
+                        {merchant, settlement},
+                        {merchant, payout},
+                        ?share(750, 1000, operation_amount)
+                    ),
+                    ?cfpost(
+                        {merchant, settlement},
+                        {system, settlement},
+                        ?share(250, 1000, operation_amount)
+                    )
+                ]}
         },
         wallets = #domain_WalletServiceTerms{
             currencies = {value, ordsets:from_list([?cur(<<"RUB">>)])}
         }
     },
-    Decision1 = {delegates, [
-        #domain_PaymentRoutingDelegate{
-            allowed = {condition, {party, #domain_PartyCondition{id = <<"12345">>}}},
-            ruleset = ?ruleset(2)
-        },
-        #domain_PaymentRoutingDelegate{
-            allowed = {condition, {party, #domain_PartyCondition{id = <<"67890">>}}},
-            ruleset = ?ruleset(3)
-        },
-        #domain_PaymentRoutingDelegate{
-            allowed = {constant, true},
-            ruleset = ?ruleset(4)
-        }
-    ]},
-    Decision2 = {candidates, [
-        #domain_PaymentRoutingCandidate{
-            allowed = {constant, true},
-            terminal = ?trm(1)
-        }
-    ]},
-    Decision3 = {candidates, [
-        #domain_PaymentRoutingCandidate{
-            allowed = {condition, {party, #domain_PartyCondition{id = <<"67890">>}}},
-            terminal = ?trm(2)
-        },
-        #domain_PaymentRoutingCandidate{
-            allowed = {constant, true},
-            terminal = ?trm(3)
-        },
-        #domain_PaymentRoutingCandidate{
-            allowed = {constant, true},
-            terminal = ?trm(1)
-        }
-    ]},
-    Decision4 = {candidates, [
-        #domain_PaymentRoutingCandidate{
-            allowed = {constant, true},
-            terminal = ?trm(3)
-        }
-    ]},
+    Decision1 =
+        {delegates, [
+            #domain_PaymentRoutingDelegate{
+                allowed = {condition, {party, #domain_PartyCondition{id = <<"12345">>}}},
+                ruleset = ?ruleset(2)
+            },
+            #domain_PaymentRoutingDelegate{
+                allowed = {condition, {party, #domain_PartyCondition{id = <<"67890">>}}},
+                ruleset = ?ruleset(3)
+            },
+            #domain_PaymentRoutingDelegate{
+                allowed = {constant, true},
+                ruleset = ?ruleset(4)
+            }
+        ]},
+    Decision2 =
+        {candidates, [
+            #domain_PaymentRoutingCandidate{
+                allowed = {constant, true},
+                terminal = ?trm(1)
+            }
+        ]},
+    Decision3 =
+        {candidates, [
+            #domain_PaymentRoutingCandidate{
+                allowed = {condition, {party, #domain_PartyCondition{id = <<"67890">>}}},
+                terminal = ?trm(2)
+            },
+            #domain_PaymentRoutingCandidate{
+                allowed = {constant, true},
+                terminal = ?trm(3)
+            },
+            #domain_PaymentRoutingCandidate{
+                allowed = {constant, true},
+                terminal = ?trm(1)
+            }
+        ]},
+    Decision4 =
+        {candidates, [
+            #domain_PaymentRoutingCandidate{
+                allowed = {constant, true},
+                terminal = ?trm(3)
+            }
+        ]},
     [
         construct_currency(?cur(<<"RUB">>)),
         construct_currency(?cur(<<"USD">>)),
@@ -238,52 +253,66 @@ construct_domain_fixture() ->
             ref = ?trms(1),
             data = #domain_TermSetHierarchy{
                 parent_terms = undefined,
-                term_sets = [#domain_TimedTermSet{
-                    action_time = #'TimestampInterval'{},
-                    terms = TestTermSet
-                }]
+                term_sets = [
+                    #domain_TimedTermSet{
+                        action_time = #'TimestampInterval'{},
+                        terms = TestTermSet
+                    }
+                ]
             }
         }},
         {term_set_hierarchy, #domain_TermSetHierarchyObject{
             ref = ?trms(2),
             data = #domain_TermSetHierarchy{
                 parent_terms = undefined,
-                term_sets = [#domain_TimedTermSet{
-                    action_time = #'TimestampInterval'{},
-                    terms = DefaultTermSet
-                }]
+                term_sets = [
+                    #domain_TimedTermSet{
+                        action_time = #'TimestampInterval'{},
+                        terms = DefaultTermSet
+                    }
+                ]
             }
         }},
         {term_set_hierarchy, #domain_TermSetHierarchyObject{
             ref = ?trms(3),
             data = #domain_TermSetHierarchy{
                 parent_terms = ?trms(2),
-                term_sets = [#domain_TimedTermSet{
-                    action_time = #'TimestampInterval'{},
-                    terms = TermSet
-                }]
+                term_sets = [
+                    #domain_TimedTermSet{
+                        action_time = #'TimestampInterval'{},
+                        terms = TermSet
+                    }
+                ]
             }
         }},
         {term_set_hierarchy, #domain_TermSetHierarchyObject{
             ref = ?trms(4),
             data = #domain_TermSetHierarchy{
                 parent_terms = ?trms(3),
-                term_sets = [#domain_TimedTermSet{
-                    action_time = #'TimestampInterval'{},
-                    terms = #domain_TermSet{
-                        payments = #domain_PaymentsServiceTerms{
-                            currencies = {value, ordsets:from_list([
-                                ?cur(<<"RUB">>)
-                            ])},
-                            categories = {value, ordsets:from_list([
-                                ?cat(2)
-                            ])},
-                            payment_methods = {value, ordsets:from_list([
-                                ?pmt(bank_card_deprecated, visa)
-                            ])}
+                term_sets = [
+                    #domain_TimedTermSet{
+                        action_time = #'TimestampInterval'{},
+                        terms = #domain_TermSet{
+                            payments = #domain_PaymentsServiceTerms{
+                                currencies =
+                                    {value,
+                                        ordsets:from_list([
+                                            ?cur(<<"RUB">>)
+                                        ])},
+                                categories =
+                                    {value,
+                                        ordsets:from_list([
+                                            ?cat(2)
+                                        ])},
+                                payment_methods =
+                                    {value,
+                                        ordsets:from_list([
+                                            ?pmt(bank_card_deprecated, visa)
+                                        ])}
+                            }
                         }
                     }
-                }]
+                ]
             }
         }},
         {provider, #domain_ProviderObject{
@@ -298,63 +327,83 @@ construct_domain_fixture() ->
                     payments = #domain_PaymentsProvisionTerms{
                         currencies = {value, ?ordset([?cur(<<"RUB">>)])},
                         categories = {value, ?ordset([?cat(1)])},
-                        payment_methods = {value, ?ordset([
-                            ?pmt(bank_card_deprecated, visa),
-                            ?pmt(bank_card_deprecated, mastercard)
-                        ])},
-                        cash_limit = {value, ?cashrng(
-                            {inclusive, ?cash(      1000, <<"RUB">>)},
-                            {exclusive, ?cash(1000000000, <<"RUB">>)}
-                        )},
-                        cash_flow = {decisions, [
-                            #domain_CashFlowDecision{
-                                if_   = {condition, {currency_is, ?cur(<<"RUB">>)}},
-                                then_ = {value, [
-                                    ?cfpost(
-                                        {system, settlement},
-                                        {provider, settlement},
-                                        {product, {min_of, ?ordset([
-                                            ?fixed(10, <<"RUB">>),
-                                            ?share(
-                                                5, 100, operation_amount, round_half_towards_zero
+                        payment_methods =
+                            {value,
+                                ?ordset([
+                                    ?pmt(bank_card_deprecated, visa),
+                                    ?pmt(bank_card_deprecated, mastercard)
+                                ])},
+                        cash_limit =
+                            {value,
+                                ?cashrng(
+                                    {inclusive, ?cash(1000, <<"RUB">>)},
+                                    {exclusive, ?cash(1000000000, <<"RUB">>)}
+                                )},
+                        cash_flow =
+                            {decisions, [
+                                #domain_CashFlowDecision{
+                                    if_ = {condition, {currency_is, ?cur(<<"RUB">>)}},
+                                    then_ =
+                                        {value, [
+                                            ?cfpost(
+                                                {system, settlement},
+                                                {provider, settlement},
+                                                {product,
+                                                    {min_of,
+                                                        ?ordset([
+                                                            ?fixed(10, <<"RUB">>),
+                                                            ?share(
+                                                                5,
+                                                                100,
+                                                                operation_amount,
+                                                                round_half_towards_zero
+                                                            )
+                                                        ])}}
                                             )
-                                        ])}}
-                                    )
-                                ]}
-                            },
-                            #domain_CashFlowDecision{
-                                if_   = {condition, {currency_is, ?cur(<<"USD">>)}},
-                                then_ = {value, [
-                                    ?cfpost(
-                                        {system, settlement},
-                                        {provider, settlement},
-                                        {product, {min_of, ?ordset([
-                                            ?fixed(10, <<"USD">>),
-                                            ?share(
-                                                5, 100, operation_amount, round_half_towards_zero
+                                        ]}
+                                },
+                                #domain_CashFlowDecision{
+                                    if_ = {condition, {currency_is, ?cur(<<"USD">>)}},
+                                    then_ =
+                                        {value, [
+                                            ?cfpost(
+                                                {system, settlement},
+                                                {provider, settlement},
+                                                {product,
+                                                    {min_of,
+                                                        ?ordset([
+                                                            ?fixed(10, <<"USD">>),
+                                                            ?share(
+                                                                5,
+                                                                100,
+                                                                operation_amount,
+                                                                round_half_towards_zero
+                                                            )
+                                                        ])}}
                                             )
-                                        ])}}
-                                    )
-                                ]}
-                            }
-                        ]}
+                                        ]}
+                                }
+                            ]}
                     },
                     recurrent_paytools = #domain_RecurrentPaytoolsProvisionTerms{
                         categories = {value, ?ordset([?cat(1)])},
-                        payment_methods = {value, ?ordset([
-                            ?pmt(bank_card_deprecated, visa),
-                            ?pmt(bank_card_deprecated, mastercard)
-                        ])},
-                        cash_value = {decisions, [
-                            #domain_CashValueDecision{
-                                if_   = {condition, {currency_is, ?cur(<<"RUB">>)}},
-                                then_ = {value, ?cash(1000, <<"RUB">>)}
-                            },
-                            #domain_CashValueDecision{
-                                if_   = {condition, {currency_is, ?cur(<<"USD">>)}},
-                                then_ = {value, ?cash(1000, <<"USD">>)}
-                            }
-                        ]}
+                        payment_methods =
+                            {value,
+                                ?ordset([
+                                    ?pmt(bank_card_deprecated, visa),
+                                    ?pmt(bank_card_deprecated, mastercard)
+                                ])},
+                        cash_value =
+                            {decisions, [
+                                #domain_CashValueDecision{
+                                    if_ = {condition, {currency_is, ?cur(<<"RUB">>)}},
+                                    then_ = {value, ?cash(1000, <<"RUB">>)}
+                                },
+                                #domain_CashValueDecision{
+                                    if_ = {condition, {currency_is, ?cur(<<"USD">>)}},
+                                    then_ = {value, ?cash(1000, <<"USD">>)}
+                                }
+                            ]}
                     }
                 }
             }
@@ -367,9 +416,11 @@ construct_domain_fixture() ->
                 description = <<"Brominal 1">>,
                 terms = #domain_ProvisionTermSet{
                     payments = #domain_PaymentsProvisionTerms{
-                        payment_methods = {value, ?ordset([
-                            ?pmt(bank_card_deprecated, visa)
-                        ])}
+                        payment_methods =
+                            {value,
+                                ?ordset([
+                                    ?pmt(bank_card_deprecated, visa)
+                                ])}
                     }
                 }
             }
@@ -381,9 +432,11 @@ construct_domain_fixture() ->
                 description = <<"Brominal 2">>,
                 terms = #domain_ProvisionTermSet{
                     payments = #domain_PaymentsProvisionTerms{
-                        payment_methods = {value, ?ordset([
-                            ?pmt(bank_card_deprecated, visa)
-                        ])}
+                        payment_methods =
+                            {value,
+                                ?ordset([
+                                    ?pmt(bank_card_deprecated, visa)
+                                ])}
                     }
                 }
             }
@@ -395,9 +448,11 @@ construct_domain_fixture() ->
                 description = <<"Brominal 3">>,
                 terms = #domain_ProvisionTermSet{
                     payments = #domain_PaymentsProvisionTerms{
-                        payment_methods = {value, ?ordset([
-                            ?pmt(bank_card_deprecated, visa)
-                        ])}
+                        payment_methods =
+                            {value,
+                                ?ordset([
+                                    ?pmt(bank_card_deprecated, visa)
+                                ])}
                     }
                 }
             }
@@ -406,13 +461,11 @@ construct_domain_fixture() ->
 
 %% Internal functions
 
--spec construct_currency(currency()) ->
-    {currency, dmsl_domain_thrift:'CurrencyObject'()}.
+-spec construct_currency(currency()) -> {currency, dmsl_domain_thrift:'CurrencyObject'()}.
 construct_currency(Ref) ->
     construct_currency(Ref, 2).
 
--spec construct_currency(currency(), Exponent :: pos_integer()) ->
-    {currency, dmsl_domain_thrift:'CurrencyObject'()}.
+-spec construct_currency(currency(), Exponent :: pos_integer()) -> {currency, dmsl_domain_thrift:'CurrencyObject'()}.
 construct_currency(?cur(SymbolicCode) = Ref, Exponent) ->
     {currency, #domain_CurrencyObject{
         ref = Ref,
@@ -424,8 +477,7 @@ construct_currency(?cur(SymbolicCode) = Ref, Exponent) ->
         }
     }}.
 
--spec construct_category(category(), name(), test | live) ->
-    {category, dmsl_domain_thrift:'CategoryObject'()}.
+-spec construct_category(category(), name(), test | live) -> {category, dmsl_domain_thrift:'CategoryObject'()}.
 construct_category(Ref, Name, Type) ->
     {category, #domain_CategoryObject{
         ref = Ref,
@@ -465,26 +517,23 @@ construct_payout_method(?pomt(M) = Ref) ->
         }
     }}.
 
--spec construct_proxy(proxy(), name()) ->
-    {proxy, dmsl_domain_thrift:'ProxyObject'()}.
+-spec construct_proxy(proxy(), name()) -> {proxy, dmsl_domain_thrift:'ProxyObject'()}.
 construct_proxy(Ref, Name) ->
     construct_proxy(Ref, Name, #{}).
 
--spec construct_proxy(proxy(), name(), Opts :: map()) ->
-    {proxy, dmsl_domain_thrift:'ProxyObject'()}.
+-spec construct_proxy(proxy(), name(), Opts :: map()) -> {proxy, dmsl_domain_thrift:'ProxyObject'()}.
 construct_proxy(Ref, Name, Opts) ->
     {proxy, #domain_ProxyObject{
         ref = Ref,
         data = #domain_ProxyDefinition{
-            name        = Name,
+            name = Name,
             description = Name,
-            url         = <<>>,
-            options     = Opts
+            url = <<>>,
+            options = Opts
         }
     }}.
 
--spec construct_inspector(inspector(), name(), proxy()) ->
-    {inspector, dmsl_domain_thrift:'InspectorObject'()}.
+-spec construct_inspector(inspector(), name(), proxy()) -> {inspector, dmsl_domain_thrift:'InspectorObject'()}.
 construct_inspector(Ref, Name, ProxyRef) ->
     construct_inspector(Ref, Name, ProxyRef, #{}).
 
@@ -534,9 +583,11 @@ construct_system_account_set(Ref, Name, ?cur(CurrencyCode)) ->
         data = #domain_SystemAccountSet{
             name = Name,
             description = Name,
-            accounts = #{?cur(CurrencyCode) => #domain_SystemAccount{
-                settlement = AccountID
-            }}
+            accounts = #{
+                ?cur(CurrencyCode) => #domain_SystemAccount{
+                    settlement = AccountID
+                }
+            }
         }
     }}.
 
@@ -555,10 +606,12 @@ construct_external_account_set(Ref, Name, ?cur(CurrencyCode)) ->
         data = #domain_ExternalAccountSet{
             name = Name,
             description = Name,
-            accounts = #{?cur(CurrencyCode) => #domain_ExternalAccount{
-                income  = AccountID1,
-                outcome = AccountID2
-            }}
+            accounts = #{
+                ?cur(CurrencyCode) => #domain_ExternalAccount{
+                    income = AccountID1,
+                    outcome = AccountID2
+                }
+            }
         }
     }}.
 
@@ -583,7 +636,6 @@ construct_business_schedule(Ref) ->
 
 -spec construct_payment_routing_ruleset(payment_routing_ruleset(), name(), _) ->
     dmsl_domain_thrift:'PaymentRoutingRulesetObject'().
-
 construct_payment_routing_ruleset(Ref, Name, Decisions) ->
     {payment_routing_rules, #domain_PaymentRoutingRulesObject{
         ref = Ref,

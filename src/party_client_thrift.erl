@@ -179,9 +179,7 @@
 
 %% Party API
 
--spec create(party_id(), party_params(), client(), context()) ->
-    ok | {error, error(Error)} | no_return()
-when
+-spec create(party_id(), party_params(), client(), context()) -> ok | {error, error(Error)} | no_return() when
     Error :: invalid_user() | party_exists().
 create(PartyId, PartyParams, Client, Context) ->
     call('Create', [PartyId, PartyParams], Client, Context).
@@ -199,28 +197,23 @@ get(PartyId, Client, Context) ->
 get_revision(PartyId, Client, Context) ->
     call('GetRevision', [PartyId], Client, Context).
 
--spec checkout(party_id(), party_revision_param(), client(), context()) ->
-    result(party(), invalid_party_revision()).
+-spec checkout(party_id(), party_revision_param(), client(), context()) -> result(party(), invalid_party_revision()).
 checkout(PartyId, PartyRevisionParam, Client, Context) ->
     call('Checkout', [PartyId, PartyRevisionParam], Client, Context).
 
--spec block(party_id(), unblock_reason(), client(), context()) -> void(Error) when
-    Error :: invalid_party_status().
+-spec block(party_id(), unblock_reason(), client(), context()) -> void(Error) when Error :: invalid_party_status().
 block(PartyId, Reason, Client, Context) ->
     call('Block', [PartyId, Reason], Client, Context).
 
--spec unblock(party_id(), block_reason(), client(), context()) -> void(Error) when
-    Error :: invalid_party_status().
+-spec unblock(party_id(), block_reason(), client(), context()) -> void(Error) when Error :: invalid_party_status().
 unblock(PartyId, Reason, Client, Context) ->
     call('Unblock', [PartyId, Reason], Client, Context).
 
--spec suspend(party_id(), client(), context()) -> void(Error) when
-    Error :: invalid_party_status().
+-spec suspend(party_id(), client(), context()) -> void(Error) when Error :: invalid_party_status().
 suspend(PartyId, Client, Context) ->
     call('Suspend', [PartyId], Client, Context).
 
--spec activate(party_id(), client(), context()) -> void(Error) when
-    Error :: invalid_party_status().
+-spec activate(party_id(), client(), context()) -> void(Error) when Error :: invalid_party_status().
 activate(PartyId, Client, Context) ->
     call('Activate', [PartyId], Client, Context).
 
@@ -237,8 +230,7 @@ get_metadata(PartyId, Ns, Client, Context) ->
 set_metadata(PartyId, Ns, Data, Client, Context) ->
     call('SetMetaData', [PartyId, Ns, Data], Client, Context).
 
--spec remove_metadata(party_id(), meta_ns(), client(), context()) -> void(Error) when
-    Error :: meta_ns_not_found().
+-spec remove_metadata(party_id(), meta_ns(), client(), context()) -> void(Error) when Error :: meta_ns_not_found().
 remove_metadata(PartyId, Ns, Client, Context) ->
     call('RemoveMetaData', [PartyId, Ns], Client, Context).
 
@@ -261,9 +253,7 @@ compute_contract_terms(PartyId, ContractId, Timestamp, PartyRevision, DomainRevi
     Args = [PartyId, ContractId, Timestamp, PartyRevision, DomainRevision, Varset],
     call('ComputeContractTerms', Args, Client, Context).
 
--spec compute_provider(Ref, Domain, Varset, client(), context()) ->
-    result(provider(), Error)
-    when
+-spec compute_provider(Ref, Domain, Varset, client(), context()) -> result(provider(), Error) when
     Ref :: provider_ref(),
     Domain :: domain_revision(),
     Varset :: varset(),
@@ -273,7 +263,7 @@ compute_provider(Ref, Domain, Varset, Client, Context) ->
 
 -spec compute_provider_terminal_terms(Ref, TerminalRef, Domain, Varset, client(), context()) ->
     result(provision_term_set(), Error)
-    when
+when
     Ref :: provider_ref(),
     TerminalRef :: terminal_ref(),
     Domain :: domain_revision(),
@@ -282,9 +272,7 @@ compute_provider(Ref, Domain, Varset, Client, Context) ->
 compute_provider_terminal_terms(Ref, TerminalRef, Domain, Varset, Client, Context) ->
     call('ComputeProviderTerminalTerms', [Ref, TerminalRef, Domain, Varset], Client, Context).
 
--spec compute_globals(Ref, Domain, Varset, client(), context()) ->
-    result(globals(), Error)
-    when
+-spec compute_globals(Ref, Domain, Varset, client(), context()) -> result(globals(), Error) when
     Ref :: globals_ref(),
     Domain :: domain_revision(),
     Varset :: varset(),
@@ -294,7 +282,7 @@ compute_globals(Ref, Domain, Varset, Client, Context) ->
 
 -spec compute_payment_routing_ruleset(Ref, Domain, Varset, client(), context()) ->
     result(payment_routing_ruleset(), Error)
-    when
+when
     Ref :: payment_routing_ruleset_ref(),
     Domain :: domain_revision(),
     Varset :: varset(),
@@ -309,9 +297,7 @@ when
 compute_payment_institution_terms(PartyId, Ref, Varset, Client, Context) ->
     call('ComputePaymentInstitutionTerms', [PartyId, Ref, Varset], Client, Context).
 
--spec compute_payment_institution(Ref, Domain, Varset, client(), context()) ->
-    result(payment_institution(), Error)
-when
+-spec compute_payment_institution(Ref, Domain, Varset, client(), context()) -> result(payment_institution(), Error) when
     Ref :: payment_institution_ref(),
     Domain :: domain_revision(),
     Varset :: varset(),
@@ -326,8 +312,7 @@ when
 compute_payout_cash_flow(PartyId, Params, Client, Context) ->
     call('ComputePayoutCashFlow', [PartyId, Params], Client, Context).
 
--spec get_shop(party_id(), shop_id(), client(), context()) -> result(shop(), Error) when
-    Error :: shop_not_found().
+-spec get_shop(party_id(), shop_id(), client(), context()) -> result(shop(), Error) when Error :: shop_not_found().
 get_shop(PartyId, ShopId, Client, Context) ->
     call('GetShop', [PartyId, ShopId], Client, Context).
 
@@ -358,8 +343,7 @@ when
 compute_shop_terms(PartyId, ShopId, Timestamp, PartyRevision, Client, Context) ->
     call('ComputeShopTerms', [PartyId, ShopId, Timestamp, PartyRevision], Client, Context).
 
--spec get_claim(party_id(), claim_id(), client(), context()) -> result(claim(), Error) when
-    Error :: claim_not_found().
+-spec get_claim(party_id(), claim_id(), client(), context()) -> result(claim(), Error) when Error :: claim_not_found().
 get_claim(PartyId, ClaimId, Client, Context) ->
     call('GetClaim', [PartyId, ClaimId], Client, Context).
 
@@ -372,11 +356,15 @@ get_claims(PartyId, Client, Context) ->
 create_claim(PartyId, Changeset, Client, Context) ->
     call('CreateClaim', [PartyId, Changeset], Client, Context).
 
--spec update_claim(party_id(), claim_id(), claim_revision(), changeset(), client(), context()) ->
-    void(Error)
-when
-    Error :: invalid_party_status() | changeset_conflict() | invalid_changeset() | invalid_request() |
-        claim_not_found() | invalid_claim_status() | invalid_claim_revision().
+-spec update_claim(party_id(), claim_id(), claim_revision(), changeset(), client(), context()) -> void(Error) when
+    Error ::
+        invalid_party_status()
+        | changeset_conflict()
+        | invalid_changeset()
+        | invalid_request()
+        | claim_not_found()
+        | invalid_claim_status()
+        | invalid_claim_revision().
 update_claim(PartyId, ClaimId, Revision, Changeset, Client, Context) ->
     call('UpdateClaim', [PartyId, ClaimId, Revision, Changeset], Client, Context).
 
@@ -385,16 +373,12 @@ update_claim(PartyId, ClaimId, Revision, Changeset, Client, Context) ->
 accept_claim(PartyId, ClaimId, Revision, Client, Context) ->
     call('AcceptClaim', [PartyId, ClaimId, Revision], Client, Context).
 
--spec deny_claim(party_id(), claim_id(), claim_revision(), deny_reason(), client(), context()) ->
-    void(Error)
-when
+-spec deny_claim(party_id(), claim_id(), claim_revision(), deny_reason(), client(), context()) -> void(Error) when
     Error :: claim_not_found() | invalid_claim_revision() | invalid_claim_status().
 deny_claim(PartyId, ClaimId, Revision, Reason, Client, Context) ->
     call('DenyClaim', [PartyId, ClaimId, Revision, Reason], Client, Context).
 
--spec revoke_claim(party_id(), claim_id(), claim_revision(), revoke_reason(), client(), context()) ->
-    void(Error)
-when
+-spec revoke_claim(party_id(), claim_id(), claim_revision(), revoke_reason(), client(), context()) -> void(Error) when
     Error :: invalid_party_status() | claim_not_found() | invalid_claim_revision() | invalid_claim_status().
 revoke_claim(PartyId, ClaimId, Revision, Reason, Client, Context) ->
     call('RevokeClaim', [PartyId, ClaimId, Revision, Reason], Client, Context).
