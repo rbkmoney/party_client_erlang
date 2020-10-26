@@ -211,8 +211,9 @@ shop_create_and_get_test(C) ->
     Timestamp = genlib_rfc3339:format(genlib_time:unow() + 10, millisecond),
     {ok, PartyRevision} = party_client_thrift:get_revision(PartyId, Client, Context),
     PartyRevisionParam = {revision, PartyRevision},
+    Varset = #payproc_Varset{},
     {ok, _Terms} =
-        party_client_thrift:compute_shop_terms(PartyId, ShopId, Timestamp, PartyRevisionParam, Client, Context).
+        party_client_thrift:compute_shop_terms(PartyId, ShopId, Timestamp, PartyRevisionParam, Varset, Client, Context).
 
 -spec shop_operations_test(config()) -> any().
 shop_operations_test(C) ->
