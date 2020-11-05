@@ -87,7 +87,7 @@
 -type final_cash_flow() :: dmsl_domain_thrift:'FinalCashFlow'().
 -type event_range() :: dmsl_payment_processing_thrift:'EventRange'().
 -type predestination() :: dmsl_payment_processing_thrift:'Predestination'().
--type collected_routes() :: dmsl_payment_processing_thrift:'CollectRoutes'().
+-type collected_routes() :: dmsl_payment_processing_thrift:'CollectedRoutes'().
 -type block_reason() :: binary().
 -type unblock_reason() :: binary().
 -type deny_reason() :: binary() | undefined.
