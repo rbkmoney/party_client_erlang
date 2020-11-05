@@ -28,6 +28,8 @@
 -export([compute_payment_institution/5]).
 -export([compute_payout_cash_flow/4]).
 
+-export([collect_routes/6]).
+
 -export([block_shop/5]).
 -export([unblock_shop/5]).
 -export([suspend_shop/4]).
@@ -84,6 +86,8 @@
 -type domain_revision() :: dmsl_domain_thrift:'DataRevision'().
 -type final_cash_flow() :: dmsl_domain_thrift:'FinalCashFlow'().
 -type event_range() :: dmsl_payment_processing_thrift:'EventRange'().
+-type predestination() :: dmsl_payment_processing_thrift:'Predestination'().
+-type collected_routes() :: dmsl_payment_processing_thrift:'CollectRoutes'().
 -type block_reason() :: binary().
 -type unblock_reason() :: binary().
 -type deny_reason() :: binary() | undefined.
@@ -311,6 +315,17 @@ when
     Error :: party_not_exists_yet() | shop_not_found() | not_permitted().
 compute_payout_cash_flow(PartyId, Params, Client, Context) ->
     call('ComputePayoutCashFlow', [PartyId, Params], Client, Context).
+
+-spec collect_routes(Predestination, PaymentInst, Revision, VS, client(), context()) ->
+    result(collected_routes(), Error)
+when
+    Predestination :: predestination(),
+    PaymentInst :: payment_institution(),
+    Revision :: domain_revision(),
+    VS :: varset(),
+    Error :: party_not_exists_yet() | shop_not_found() | not_permitted().
+collect_routes(Predestination, PaymentInst, Revision, VS, Client, Context) ->
+    call('CollectRoutes', [Predestination, PaymentInst, Revision, VS], Client, Context).
 
 -spec get_shop(party_id(), shop_id(), client(), context()) -> result(shop(), Error) when Error :: shop_not_found().
 get_shop(PartyId, ShopId, Client, Context) ->
