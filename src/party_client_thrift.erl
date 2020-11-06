@@ -29,6 +29,7 @@
 -export([compute_payout_cash_flow/4]).
 
 -export([collect_routes/6]).
+-export([collect_routes_with_rules/6]).
 
 -export([block_shop/5]).
 -export([unblock_shop/5]).
@@ -326,6 +327,17 @@ when
     Error :: party_not_exists_yet() | shop_not_found() | not_permitted().
 collect_routes(Predestination, PaymentInst, Revision, VS, Client, Context) ->
     call('CollectRoutes', [Predestination, PaymentInst, Revision, VS], Client, Context).
+
+-spec collect_routes_with_rules(Predestination, PaymentInst, Revision, VS, client(), context()) ->
+    result(collected_routes(), Error)
+when
+    Predestination :: predestination(),
+    PaymentInst :: payment_institution(),
+    Revision :: domain_revision(),
+    VS :: varset(),
+    Error :: party_not_exists_yet() | shop_not_found() | not_permitted().
+collect_routes_with_rules(Predestination, PaymentInst, Revision, VS, Client, Context) ->
+    call('CollectRoutesWithRules', [Predestination, PaymentInst, Revision, VS], Client, Context).
 
 -spec get_shop(party_id(), shop_id(), client(), context()) -> result(shop(), Error) when Error :: shop_not_found().
 get_shop(PartyId, ShopId, Client, Context) ->
