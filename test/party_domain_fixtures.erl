@@ -19,7 +19,7 @@
 -type template() :: dmsl_domain_thrift:'ContractTemplateRef'().
 -type terms() :: dmsl_domain_thrift:'TermSetHierarchyRef'().
 -type lifetime() :: dmsl_domain_thrift:'Lifetime'() | undefined.
--type payment_routing_ruleset() :: dmsl_domain_thrift:'PaymentRoutingRulesetRef'().
+-type routing_ruleset_ref() :: dmsl_domain_thrift:'RoutingRulesetRef'().
 
 -type system_account_set() :: dmsl_domain_thrift:'SystemAccountSetRef'().
 -type external_account_set() :: dmsl_domain_thrift:'ExternalAccountSetRef'().
@@ -121,44 +121,44 @@ construct_domain_fixture() ->
     },
     Decision1 =
         {delegates, [
-            #domain_PaymentRoutingDelegate{
+            #domain_RoutingDelegate{
                 allowed = {condition, {party, #domain_PartyCondition{id = <<"12345">>}}},
                 ruleset = ?ruleset(2)
             },
-            #domain_PaymentRoutingDelegate{
+            #domain_RoutingDelegate{
                 allowed = {condition, {party, #domain_PartyCondition{id = <<"67890">>}}},
                 ruleset = ?ruleset(3)
             },
-            #domain_PaymentRoutingDelegate{
+            #domain_RoutingDelegate{
                 allowed = {constant, true},
                 ruleset = ?ruleset(4)
             }
         ]},
     Decision2 =
         {candidates, [
-            #domain_PaymentRoutingCandidate{
+            #domain_RoutingCandidate{
                 allowed = {constant, true},
                 terminal = ?trm(1)
             }
         ]},
     Decision3 =
         {candidates, [
-            #domain_PaymentRoutingCandidate{
+            #domain_RoutingCandidate{
                 allowed = {condition, {party, #domain_PartyCondition{id = <<"67890">>}}},
                 terminal = ?trm(2)
             },
-            #domain_PaymentRoutingCandidate{
+            #domain_RoutingCandidate{
                 allowed = {constant, true},
                 terminal = ?trm(3)
             },
-            #domain_PaymentRoutingCandidate{
+            #domain_RoutingCandidate{
                 allowed = {constant, true},
                 terminal = ?trm(1)
             }
         ]},
     Decision4 =
         {candidates, [
-            #domain_PaymentRoutingCandidate{
+            #domain_RoutingCandidate{
                 allowed = {constant, true},
                 terminal = ?trm(3)
             }
@@ -634,12 +634,12 @@ construct_business_schedule(Ref) ->
         }
     }}.
 
--spec construct_payment_routing_ruleset(payment_routing_ruleset(), name(), _) ->
-    dmsl_domain_thrift:'PaymentRoutingRulesetObject'().
+-spec construct_payment_routing_ruleset(routing_ruleset_ref(), name(), _) ->
+    dmsl_domain_thrift:'RoutingRulesetObject'().
 construct_payment_routing_ruleset(Ref, Name, Decisions) ->
-    {payment_routing_rules, #domain_PaymentRoutingRulesObject{
+    {payment_routing_rules, #domain_RoutingRulesObject{
         ref = Ref,
-        data = #domain_PaymentRoutingRuleset{
+        data = #domain_RoutingRuleset{
             name = Name,
             decisions = Decisions
         }
