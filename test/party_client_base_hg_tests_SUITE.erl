@@ -73,7 +73,7 @@ groups() ->
             compute_globals_ok,
             compute_routing_ruleset_ok,
             compute_routing_ruleset_unreducable,
-            compute_payment_routing_ruleset_not_found
+            compute_routing_ruleset_not_found
         ]}
     ].
 
@@ -450,8 +450,8 @@ compute_routing_ruleset_unreducable(C) ->
             ]}
     }} = party_client_thrift:compute_routing_ruleset(?ruleset(1), DomainRevision, Varset, Client, Context).
 
--spec compute_payment_routing_ruleset_not_found(config()) -> any().
-compute_payment_routing_ruleset_not_found(C) ->
+-spec compute_routing_ruleset_not_found(config()) -> any().
+compute_routing_ruleset_not_found(C) ->
     {ok, _PartyId, Client, Context} = test_init_info(C),
     {ok, DomainRevision} = dmt_client_cache:update(),
     {error, #payproc_RuleSetNotFound{}} =
