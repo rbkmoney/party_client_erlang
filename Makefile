@@ -9,6 +9,7 @@ TEMPLATES_PATH := .
 SERVICE_NAME := party_client
 
 # Build image tag to be used
+BUILD_IMAGE_NAME := build-erlang
 BUILD_IMAGE_TAG := 61a001bbb48128895735a3ac35b0858484fdb2eb
 
 CALL_ANYWHERE := all submodules compile xref lint dialyze clean distclean check_format format
