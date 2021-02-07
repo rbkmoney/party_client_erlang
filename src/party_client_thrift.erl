@@ -23,8 +23,8 @@
 -export([compute_provider/5]).
 -export([compute_provider_terminal_terms/6]).
 -export([compute_globals/5]).
-%% Deprecated
--export([compute_payment_routing_ruleset/5]).
+
+-export([compute_payment_routing_ruleset/5]). %% Deprecated
 -export([compute_routing_ruleset/5]).
 -export([compute_payment_institution_terms/5]).
 -export([compute_payment_institution/5]).

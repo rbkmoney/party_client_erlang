@@ -187,10 +187,10 @@ construct_domain_fixture() ->
 
         construct_business_schedule(?bussched(1)),
 
-        construct_payment_routing_ruleset(?ruleset(1), <<"Rule#1">>, Decision1),
-        construct_payment_routing_ruleset(?ruleset(2), <<"Rule#2">>, Decision2),
-        construct_payment_routing_ruleset(?ruleset(3), <<"Rule#3">>, Decision3),
-        construct_payment_routing_ruleset(?ruleset(4), <<"Rule#4">>, Decision4),
+        construct_routing_ruleset(?ruleset(1), <<"Rule#1">>, Decision1),
+        construct_routing_ruleset(?ruleset(2), <<"Rule#2">>, Decision2),
+        construct_routing_ruleset(?ruleset(3), <<"Rule#3">>, Decision3),
+        construct_routing_ruleset(?ruleset(4), <<"Rule#4">>, Decision4),
 
         {payment_institution, #domain_PaymentInstitutionObject{
             ref = ?pinst(1),
@@ -634,10 +634,10 @@ construct_business_schedule(Ref) ->
         }
     }}.
 
--spec construct_payment_routing_ruleset(routing_ruleset_ref(), name(), _) ->
+-spec construct_routing_ruleset(routing_ruleset_ref(), name(), _) ->
     dmsl_domain_thrift:'RoutingRulesetObject'().
-construct_payment_routing_ruleset(Ref, Name, Decisions) ->
-    {payment_routing_rules, #domain_RoutingRulesObject{
+construct_routing_ruleset(Ref, Name, Decisions) ->
+    {routing_rules, #domain_RoutingRulesObject{
         ref = Ref,
         data = #domain_RoutingRuleset{
             name = Name,
