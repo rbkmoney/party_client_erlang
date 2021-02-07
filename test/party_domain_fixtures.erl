@@ -634,8 +634,7 @@ construct_business_schedule(Ref) ->
         }
     }}.
 
--spec construct_routing_ruleset(routing_ruleset_ref(), name(), _) ->
-    dmsl_domain_thrift:'RoutingRulesetObject'().
+-spec construct_routing_ruleset(routing_ruleset_ref(), name(), _) -> dmsl_domain_thrift:'RoutingRulesetObject'().
 construct_routing_ruleset(Ref, Name, Decisions) ->
     {routing_rules, #domain_RoutingRulesObject{
         ref = Ref,
