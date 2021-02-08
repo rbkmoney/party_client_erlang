@@ -23,10 +23,6 @@
 -export([compute_provider/5]).
 -export([compute_provider_terminal_terms/6]).
 -export([compute_globals/5]).
-
-%% Deprecated
--export([compute_payment_routing_ruleset/5]).
-
 -export([compute_routing_ruleset/5]).
 -export([compute_payment_institution_terms/5]).
 -export([compute_payment_institution/5]).
@@ -283,15 +279,6 @@ compute_provider_terminal_terms(Ref, TerminalRef, Domain, Varset, Client, Contex
     Error :: globals_not_found().
 compute_globals(Ref, Domain, Varset, Client, Context) ->
     call('ComputeGlobals', [Ref, Domain, Varset], Client, Context).
-
-%% Deprecated, compute_payment_routing_ruleset will be replaced by compute_routing_ruleset
--spec compute_payment_routing_ruleset(Ref, Domain, Varset, client(), context()) -> result(routing_ruleset(), Error) when
-    Ref :: routing_ruleset_ref(),
-    Domain :: domain_revision(),
-    Varset :: varset(),
-    Error :: ruleset_not_found().
-compute_payment_routing_ruleset(Ref, Domain, Varset, Client, Context) ->
-    call('ComputePaymentRoutingRuleset', [Ref, Domain, Varset], Client, Context).
 
 -spec compute_routing_ruleset(Ref, Domain, Varset, client(), context()) -> result(routing_ruleset(), Error) when
     Ref :: routing_ruleset(),
