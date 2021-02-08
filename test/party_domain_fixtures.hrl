@@ -22,7 +22,7 @@
 -define(p2pprov(ID), #domain_P2PProviderRef{id = ID}).
 -define(wtdrlprov(ID), #domain_WithdrawalProviderRef{id = ID}).
 -define(prvtrm(ID), #domain_ProviderTerminalRef{id = ID}).
--define(ruleset(ID), #domain_PaymentRoutingRulesetRef{id = ID}).
+-define(ruleset(ID), #domain_RoutingRulesetRef{id = ID}).
 
 -define(cashrng(Lower, Upper), #domain_CashRange{lower = Lower, upper = Upper}).
 

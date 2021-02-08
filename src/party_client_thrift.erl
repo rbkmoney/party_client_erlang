@@ -23,7 +23,7 @@
 -export([compute_provider/5]).
 -export([compute_provider_terminal_terms/6]).
 -export([compute_globals/5]).
--export([compute_payment_routing_ruleset/5]).
+-export([compute_routing_ruleset/5]).
 -export([compute_payment_institution_terms/5]).
 -export([compute_payment_institution/5]).
 -export([compute_payout_cash_flow/4]).
@@ -75,8 +75,8 @@
 -type provision_term_set() :: dmsl_domain_thrift:'ProvisionTermSet'().
 -type globals_ref() :: dmsl_domain_thrift:'GlobalsRef'().
 -type globals() :: dmsl_domain_thrift:'Globals'().
--type payment_routing_ruleset_ref() :: dmsl_domain_thrift:'PaymentRoutingRulesetRef'().
--type payment_routing_ruleset() :: dmsl_domain_thrift:'PaymentRoutingRuleset'().
+-type routing_ruleset_ref() :: dmsl_domain_thrift:'RoutingRulesetRef'().
+-type routing_ruleset() :: dmsl_domain_thrift:'RoutingRuleset'().
 -type payment_institution() :: dmsl_domain_thrift:'PaymentInstitution'().
 -type payment_institution_ref() :: dmsl_domain_thrift:'PaymentInstitutionRef'().
 -type varset() :: dmsl_payment_processing_thrift:'Varset'().
@@ -116,8 +116,8 @@
 -export_type([provision_term_set/0]).
 -export_type([globals_ref/0]).
 -export_type([globals/0]).
--export_type([payment_routing_ruleset_ref/0]).
--export_type([payment_routing_ruleset/0]).
+-export_type([routing_ruleset_ref/0]).
+-export_type([routing_ruleset/0]).
 -export_type([payment_institution_ref/0]).
 -export_type([varset/0]).
 -export_type([terms/0]).
@@ -280,15 +280,13 @@ compute_provider_terminal_terms(Ref, TerminalRef, Domain, Varset, Client, Contex
 compute_globals(Ref, Domain, Varset, Client, Context) ->
     call('ComputeGlobals', [Ref, Domain, Varset], Client, Context).
 
--spec compute_payment_routing_ruleset(Ref, Domain, Varset, client(), context()) ->
-    result(payment_routing_ruleset(), Error)
-when
-    Ref :: payment_routing_ruleset_ref(),
+-spec compute_routing_ruleset(Ref, Domain, Varset, client(), context()) -> result(routing_ruleset(), Error) when
+    Ref :: routing_ruleset(),
     Domain :: domain_revision(),
     Varset :: varset(),
     Error :: ruleset_not_found().
-compute_payment_routing_ruleset(Ref, Domain, Varset, Client, Context) ->
-    call('ComputePaymentRoutingRuleset', [Ref, Domain, Varset], Client, Context).
+compute_routing_ruleset(Ref, Domain, Varset, Client, Context) ->
+    call('ComputeRoutingRuleset', [Ref, Domain, Varset], Client, Context).
 
 -spec compute_payment_institution_terms(party_id(), payment_institution_ref(), varset(), client(), context()) ->
     result(terms(), Error)
