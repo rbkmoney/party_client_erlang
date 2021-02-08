@@ -281,7 +281,7 @@ compute_globals(Ref, Domain, Varset, Client, Context) ->
     call('ComputeGlobals', [Ref, Domain, Varset], Client, Context).
 
 -spec compute_routing_ruleset(Ref, Domain, Varset, client(), context()) -> result(routing_ruleset(), Error) when
-    Ref :: routing_ruleset(),
+    Ref :: routing_ruleset_ref(),
     Domain :: domain_revision(),
     Varset :: varset(),
     Error :: ruleset_not_found().
