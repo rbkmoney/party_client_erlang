@@ -174,7 +174,7 @@ construct_domain_fixture() ->
         construct_payment_method(?pmt(bank_card_deprecated, visa)),
         construct_payment_method(?pmt(bank_card_deprecated, mastercard)),
         construct_payment_method(?pmt(bank_card_deprecated, maestro)),
-        construct_payment_method(?pmt(payment_terminal, euroset)),
+        construct_payment_method(?pmt(payment_terminal_deprecated, euroset)),
 
         construct_payout_method(?pomt(russian_bank_account)),
         construct_payout_method(?pomt(international_bank_account)),

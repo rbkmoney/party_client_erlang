@@ -63,8 +63,8 @@
 ).
 
 -define(tkz_bank_card(PaymentSystem, TokenProvider), #domain_TokenizedBankCard{
-    payment_system = PaymentSystem,
-    token_provider = TokenProvider
+    payment_system_deprecated = PaymentSystem,
+    token_provider_deprecated = TokenProvider
 }).
 
 -define(every, {every, #'ScheduleEvery'{}}).

@@ -398,7 +398,7 @@ compute_globals_ok(C) ->
     Varset = #payproc_Varset{},
     {ok, #domain_Globals{
         external_account_set = {value, ?eas(1)}
-    }} = party_client_thrift:compute_globals(#domain_GlobalsRef{}, DomainRevision, Varset, Client, Context).
+    }} = party_client_thrift:compute_globals(DomainRevision, Varset, Client, Context).
 
 -spec compute_routing_ruleset_ok(config()) -> any().
 compute_routing_ruleset_ok(C) ->
