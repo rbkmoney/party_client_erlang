@@ -22,7 +22,7 @@
 -export([compute_shop_terms/7]).
 -export([compute_provider/5]).
 -export([compute_provider_terminal_terms/6]).
--export([compute_globals/5]).
+-export([compute_globals/4]).
 -export([compute_routing_ruleset/5]).
 -export([compute_payment_institution_terms/5]).
 -export([compute_payment_institution/5]).
@@ -272,13 +272,12 @@ when
 compute_provider_terminal_terms(Ref, TerminalRef, Domain, Varset, Client, Context) ->
     call('ComputeProviderTerminalTerms', [Ref, TerminalRef, Domain, Varset], Client, Context).
 
--spec compute_globals(Ref, Domain, Varset, client(), context()) -> result(globals(), Error) when
-    Ref :: globals_ref(),
+-spec compute_globals(Domain, Varset, client(), context()) -> result(globals(), Error) when
     Domain :: domain_revision(),
     Varset :: varset(),
     Error :: globals_not_found().
-compute_globals(Ref, Domain, Varset, Client, Context) ->
-    call('ComputeGlobals', [Ref, Domain, Varset], Client, Context).
+compute_globals(Domain, Varset, Client, Context) ->
+    call('ComputeGlobals', [Domain, Varset], Client, Context).
 
 -spec compute_routing_ruleset(Ref, Domain, Varset, client(), context()) -> result(routing_ruleset(), Error) when
     Ref :: routing_ruleset_ref(),
