@@ -10,7 +10,7 @@
  {<<"cowlib">>,{pkg,<<"cowlib">>,<<"2.8.0">>},2},
  {<<"damsel">>,
   {git,"git@github.com:rbkmoney/damsel.git",
-       {ref,"47e810187b377fa6bde7ad42830112880765f28f"}},
+       {ref,"908d8b4c701c38ee783e8e6012901526beb34c89"}},
   0},
  {<<"folsom">>,
   {git,"https://github.com/folsom-project/folsom.git",
