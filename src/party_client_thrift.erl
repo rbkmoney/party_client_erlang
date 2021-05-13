@@ -153,6 +153,7 @@
 -type invalid_request() :: dmsl_base_thrift:'InvalidRequest'().
 -type provider_not_found() :: dmsl_payment_processing_thrift:'ProviderNotFound'().
 -type terminal_not_found() :: dmsl_payment_processing_thrift:'TerminalNotFound'().
+-type provision_term_set_undef() :: dmsl_payment_processing_thrift:'ProvisionTermSetUndefined'().
 -type globals_not_found() :: dmsl_payment_processing_thrift:'GlobalsNotFound'().
 -type ruleset_not_found() :: dmsl_payment_processing_thrift:'RuleSetNotFound'().
 
@@ -268,7 +269,7 @@ when
     TerminalRef :: terminal_ref(),
     Domain :: domain_revision(),
     Varset :: varset(),
-    Error :: provider_not_found() | terminal_not_found().
+    Error :: provider_not_found() | terminal_not_found() | provision_term_set_undef().
 compute_provider_terminal_terms(Ref, TerminalRef, Domain, Varset, Client, Context) ->
     call('ComputeProviderTerminalTerms', [Ref, TerminalRef, Domain, Varset], Client, Context).
 
