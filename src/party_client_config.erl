@@ -16,14 +16,16 @@
     aggressive_caching_timeout => timeout(),
     woody_options => map(),
     deadline => timeout(),
-    retries => map()
+    retries => retries()
 }.
 
 -type cache_mode() :: disabled | safe | aggressive.
+-type retries() :: #{'_' | woody:func() => genlib_retry:strategy()}.
 
 -export_type([client/0]).
 -export_type([options/0]).
 -export_type([cache_mode/0]).
+-export_type([retries/0]).
 
 -define(APPLICATION, party_client).
 -define(DEFAULT_CACHE_NAME, party_client_default_cache).
@@ -89,7 +91,7 @@ get_deadline(#{deadline := Deadline}) ->
 get_deadline(_Client) ->
     get_default([woody, deadline], ?DEFAULT_DEADLINE).
 
--spec get_retries(client()) -> map().
+-spec get_retries(client()) -> retries().
 get_retries(#{retries := Retries}) ->
     Retries;
 get_retries(_Client) ->
