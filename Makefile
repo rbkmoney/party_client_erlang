@@ -10,7 +10,7 @@ SERVICE_NAME := party_client
 
 # Build image tag to be used
 BUILD_IMAGE_NAME := build-erlang
-BUILD_IMAGE_TAG := 61a001bbb48128895735a3ac35b0858484fdb2eb
+BUILD_IMAGE_TAG := 1aa346b3638e143b4c1fafd74b3f25041024ce35
 
 CALL_ANYWHERE := all submodules compile xref lint dialyze clean distclean check_format format
 CALL_W_CONTAINER := $(CALL_ANYWHERE) test get_test_deps
