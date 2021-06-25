@@ -27,10 +27,9 @@ start_link(Client) ->
 call(Function, Args, Client, Context) ->
     Service = party_client_config:get_party_service(Client),
     CacheControl = get_cache_control(Function, Client),
-    WoodyOptions0 = party_client_config:get_woody_options(Client),
-    WoodyOptions = WoodyOptions0#{event_handler => scoper_woody_event_handlerHandler},
+    WoodyOptions = party_client_config:get_woody_options(Client),
     WoodyContext0 = party_client_context:get_woody_context(Context),
-    WoodyContext = ensure_service_deadline(WoodyContext0, Client),
+    WoodyContext = ensure_deadline(WoodyContext0, Client),
     Retry = get_function_retry(Function, Client),
     Request = {Service, Function, Args},
     call(Request, CacheControl, WoodyOptions, WoodyContext, Retry).
@@ -107,7 +106,7 @@ get_aggressive_function_cache_mode(_Other) -> no_cache.
 
 % Retry
 
-ensure_service_deadline(WoodyContext, Client) ->
+ensure_deadline(WoodyContext, Client) ->
     case woody_context:get_deadline(WoodyContext) of
         undefined ->
             woody_context:set_deadline(get_deadline(Client), WoodyContext);
@@ -116,12 +115,7 @@ ensure_service_deadline(WoodyContext, Client) ->
     end.
 
 get_deadline(Client) ->
-    case party_client_config:get_deadline(Client) of
-        undefined ->
-            undefined;
-        Timeout ->
-            woody_deadline:from_timeout(Timeout)
-    end.
+  woody_deadline:from_timeout(party_client_config:get_deadline(Client)).
 
 get_function_retry(Function, Client) ->
     FunctionReties = party_client_config:get_retries(Client),
