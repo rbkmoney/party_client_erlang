@@ -115,7 +115,12 @@ ensure_deadline(WoodyContext, Client) ->
     end.
 
 get_deadline(Client) ->
-    woody_deadline:from_timeout(party_client_config:get_deadline(Client)).
+    case party_client_config:get_deadline(Client) of
+        undefined ->
+            undefined;
+        Deadline ->
+            woody_deadline:from_timeout(Deadline)
+    end.
 
 get_function_retry(Function, Client) ->
     FunctionReties = party_client_config:get_retries(Client),

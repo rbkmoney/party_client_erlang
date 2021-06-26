@@ -15,7 +15,7 @@
     party_service => woody_service(),
     aggressive_caching_timeout => timeout(),
     woody_options => map(),
-    deadline => timeout(),
+    deadline => timeout() | undefined,
     retries => retries()
 }.
 
@@ -32,7 +32,7 @@
 -define(DEFAULT_WORKERS_NAME, party_client_default_workers).
 -define(DEFAULT_AGGERSSIVE_CACHING_TIMEOUT, 30000).
 -define(DEFAULT_CACHE_MODE, safe).
--define(DEFAULT_DEADLINE, infinity).
+-define(DEFAULT_DEADLINE, undefined).
 
 %% Internal types
 
@@ -85,7 +85,7 @@ get_woody_options(Client) ->
     EnvOptions = merge_nested_maps(DefaultOptions, get_default([woody, options], #{})),
     merge_nested_maps(EnvOptions, maps:get(woody_options, Client, #{})).
 
--spec get_deadline(client()) -> timeout().
+-spec get_deadline(client()) -> undefined | timeout().
 get_deadline(#{deadline := Deadline}) ->
     Deadline;
 get_deadline(_Client) ->
