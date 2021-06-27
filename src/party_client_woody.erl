@@ -109,18 +109,14 @@ get_aggressive_function_cache_mode(_Other) -> no_cache.
 ensure_deadline(WoodyContext, Client) ->
     case woody_context:get_deadline(WoodyContext) of
         undefined ->
-            woody_context:set_deadline(get_deadline(Client), WoodyContext);
+            Deadline = get_deadline(Client),
+            woody_context:set_deadline(Deadline, WoodyContext);
         _AlreadySet ->
             WoodyContext
     end.
 
 get_deadline(Client) ->
-    case party_client_config:get_deadline(Client) of
-        undefined ->
-            undefined;
-        Deadline ->
-            woody_deadline:from_timeout(Deadline)
-    end.
+    woody_deadline:from_timeout(party_client_config:get_deadline_timeout(Client)).
 
 get_function_retry(Function, Client) ->
     FunctionReties = party_client_config:get_retries(Client),
