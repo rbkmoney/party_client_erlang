@@ -24,7 +24,7 @@
 -export([compute_provider_terminal_terms/6]).
 -export([compute_globals/4]).
 -export([compute_routing_ruleset/5]).
--export([compute_payment_institution_terms/5]).
+-export([compute_payment_institution_terms/4]).
 -export([compute_payment_institution/5]).
 -export([compute_payout_cash_flow/4]).
 
@@ -288,12 +288,12 @@ compute_globals(Domain, Varset, Client, Context) ->
 compute_routing_ruleset(Ref, Domain, Varset, Client, Context) ->
     call('ComputeRoutingRuleset', [Ref, Domain, Varset], Client, Context).
 
--spec compute_payment_institution_terms(party_id(), payment_institution_ref(), varset(), client(), context()) ->
+-spec compute_payment_institution_terms(payment_institution_ref(), varset(), client(), context()) ->
     result(terms(), Error)
 when
     Error :: payment_institution_not_found().
-compute_payment_institution_terms(PartyId, Ref, Varset, Client, Context) ->
-    call('ComputePaymentInstitutionTerms', [PartyId, Ref, Varset], Client, Context).
+compute_payment_institution_terms(Ref, Varset, Client, Context) ->
+    call('ComputePaymentInstitutionTerms', [Ref, Varset], Client, Context).
 
 -spec compute_payment_institution(Ref, Domain, Varset, client(), context()) -> result(payment_institution(), Error) when
     Ref :: payment_institution_ref(),

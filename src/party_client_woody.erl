@@ -26,17 +26,37 @@ start_link(Client) ->
 -spec call(atom(), tuple(), client(), context()) -> ok | {ok, any()} | {error, business_error()} | no_return().
 call(Function, Args, Client, Context) ->
     Service = party_client_config:get_party_service(Client),
-    Request = {Service, Function, Args},
     CacheControl = get_cache_control(Function, Client),
-    WoodyContext = party_client_context:get_woody_context(Context),
     WoodyOptions = party_client_config:get_woody_options(Client),
-    case woody_caching_client:call(Request, CacheControl, WoodyOptions, WoodyContext) of
-        {exception, Exception} ->
-            {error, Exception};
-        {ok, ok} ->
-            ok;
-        {ok, _Other} = Result ->
-            Result
+    WoodyContext0 = party_client_context:get_woody_context(Context),
+    WoodyContext = ensure_deadline(WoodyContext0, Client),
+    Retry = get_function_retry(Function, Client),
+    Request = {Service, Function, Args},
+    call(Request, CacheControl, WoodyOptions, WoodyContext, Retry).
+
+call(Request, CacheControl, WoodyOptions, WoodyContext, Retry) ->
+    try
+        case
+            woody_caching_client:call(
+                Request,
+                CacheControl,
+                WoodyOptions,
+                WoodyContext
+            )
+        of
+            {exception, Exception} ->
+                {error, Exception};
+            {ok, ok} ->
+                ok;
+            {ok, _Other} = Result ->
+                Result
+        end
+    catch
+        error:{woody_error, {_Source, Class, _Details}} = Error when
+            Class =:= resource_unavailable orelse Class =:= result_unknown
+        ->
+            NextRetry = apply_retry_strategy(Retry, Error, WoodyContext),
+            call(Request, CacheControl, WoodyOptions, WoodyContext, NextRetry)
     end.
 
 %% Internal functions
@@ -83,3 +103,43 @@ get_aggressive_function_cache_mode('GetShopAccount') -> temporary;
 get_aggressive_function_cache_mode('ComputePaymentInstitutionTerms') -> temporary;
 get_aggressive_function_cache_mode('ComputePayoutCashFlow') -> temporary;
 get_aggressive_function_cache_mode(_Other) -> no_cache.
+
+% Retry
+
+ensure_deadline(WoodyContext, Client) ->
+    case woody_context:get_deadline(WoodyContext) of
+        undefined ->
+            Deadline = get_deadline(Client),
+            woody_context:set_deadline(Deadline, WoodyContext);
+        _AlreadySet ->
+            WoodyContext
+    end.
+
+get_deadline(Client) ->
+    woody_deadline:from_timeout(party_client_config:get_deadline_timeout(Client)).
+
+get_function_retry(Function, Client) ->
+    FunctionReties = party_client_config:get_retries(Client),
+    DefaultRetry = maps:get('_', FunctionReties, finish),
+    maps:get(Function, FunctionReties, DefaultRetry).
+
+apply_retry_strategy(Retry, Error, Context) ->
+    apply_retry_step(genlib_retry:next_step(Retry), woody_context:get_deadline(Context), Error).
+
+apply_retry_step(finish, _, Error) ->
+    erlang:error(Error);
+apply_retry_step({wait, Timeout, Retry}, undefined, _) ->
+    ok = timer:sleep(Timeout),
+    Retry;
+apply_retry_step({wait, Timeout, Retry}, Deadline0, Error) ->
+    Deadline1 = woody_deadline:from_unixtime_ms(
+        woody_deadline:to_unixtime_ms(Deadline0) - Timeout
+    ),
+    case woody_deadline:is_reached(Deadline1) of
+        true ->
+            % no more time for retries
+            erlang:error(Error);
+        false ->
+            ok = timer:sleep(Timeout),
+            Retry
+    end.
