@@ -34,7 +34,7 @@ apply_domain_fixture() ->
 
 -spec apply_domain_fixture([dmsl_domain_thrift:'DomainObject'()]) -> ok.
 apply_domain_fixture(Fixture) ->
-    #'Snapshot'{version = Head} = dmt_client:checkout({head, #'Head'{}}),
+    #'Snapshot'{version = Head} = dmt_client:checkout(latest),
     Commit = #'Commit'{ops = [{insert, #'InsertOp'{object = F}} || F <- Fixture]},
     %%    logger:error("Fixture: ~p~nCommit: ~p", [Fixture, Commit]),
     _NextRevision = dmt_client:commit(Head, Commit),
@@ -42,7 +42,7 @@ apply_domain_fixture(Fixture) ->
 
 -spec cleanup() -> ok.
 cleanup() ->
-    #'Snapshot'{domain = Domain, version = Head} = dmt_client:checkout({head, #'Head'{}}),
+    #'Snapshot'{domain = Domain, version = Head} = dmt_client:checkout(latest),
     Objects = maps:values(Domain),
     Commit = #'Commit'{ops = [{remove, #'RemoveOp'{object = O}} || O <- Objects]},
     _NextRevision = dmt_client:commit(Head, Commit),
