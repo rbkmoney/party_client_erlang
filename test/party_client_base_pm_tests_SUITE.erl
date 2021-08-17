@@ -1,4 +1,4 @@
--module(party_client_base_hg_tests_SUITE).
+-module(party_client_base_pm_tests_SUITE).
 
 -include("party_domain_fixtures.hrl").
 
