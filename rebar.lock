@@ -4,7 +4,7 @@
  {<<"cowboy">>,{pkg,<<"cowboy">>,<<"2.9.0">>},1},
  {<<"cowlib">>,{pkg,<<"cowlib">>,<<"2.11.0">>},2},
  {<<"damsel">>,
-  {git,"git@github.com:rbkmoney/damsel.git",
+  {git,"https://github.com/rbkmoney/damsel.git",
        {ref,"c6c5feabd6408ce24393bd63636a46c7c23f0949"}},
   0},
  {<<"genlib">>,
@@ -29,11 +29,11 @@
   1},
  {<<"unicode_util_compat">>,{pkg,<<"unicode_util_compat">>,<<"0.7.0">>},2},
  {<<"woody">>,
-  {git,"git@github.com:rbkmoney/woody_erlang.git",
+  {git,"https://github.com/rbkmoney/woody_erlang.git",
        {ref,"330bdcf71e99c2ea7aed424cd718939cb360ec1c"}},
   0},
  {<<"woody_user_identity">>,
-  {git,"git@github.com:rbkmoney/woody_erlang_user_identity.git",
+  {git,"https://github.com/rbkmoney/woody_erlang_user_identity.git",
        {ref,"a480762fea8d7c08f105fb39ca809482b6cb042e"}},
   0}]}.
 [
