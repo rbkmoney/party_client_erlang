@@ -6,7 +6,7 @@ namespaces:
                 type: machine
                 machine_id: payproc
         processor:
-            url: http://hellgate:8022/v1/stateproc/party
+            url: http://party-management:8022/v1/stateproc/party
     domain-config:
         processor:
             url: http://dominant:8022/v1/stateproc
