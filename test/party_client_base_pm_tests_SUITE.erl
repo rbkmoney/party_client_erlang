@@ -1,4 +1,4 @@
--module(party_client_base_hg_tests_SUITE).
+-module(party_client_base_pm_tests_SUITE).
 
 -include("party_domain_fixtures.hrl").
 
@@ -293,16 +293,7 @@ compute_provider_ok(C) ->
     Varset = #payproc_Varset{
         currency = ?cur(<<"RUB">>)
     },
-    CashFlow = ?cfpost(
-        {system, settlement},
-        {provider, settlement},
-        {product,
-            {min_of,
-                ?ordset([
-                    ?fixed(10, <<"RUB">>),
-                    ?share(5, 100, operation_amount, round_half_towards_zero)
-                ])}}
-    ),
+    CashFlow = make_test_cashflow(),
     {ok, #domain_Provider{
         terms = #domain_ProvisionTermSet{
             payments = #domain_PaymentsProvisionTerms{
@@ -334,16 +325,7 @@ compute_provider_terminal_terms_ok(C) ->
     Varset = #payproc_Varset{
         currency = ?cur(<<"RUB">>)
     },
-    CashFlow = ?cfpost(
-        {system, settlement},
-        {provider, settlement},
-        {product,
-            {min_of,
-                ?ordset([
-                    ?fixed(10, <<"RUB">>),
-                    ?share(5, 100, operation_amount, round_half_towards_zero)
-                ])}}
-    ),
+    CashFlow = make_test_cashflow(),
     PaymentMethods = ?ordset([?pmt(bank_card_deprecated, visa)]),
     {ok, #domain_ProvisionTermSet{
         payments = #domain_PaymentsProvisionTerms{
@@ -605,6 +587,19 @@ make_battle_ready_payout_tool_params() ->
                 bank_bik = <<"66642666">>
             }}
     }.
+
+-spec make_test_cashflow() -> dmsl_domain_thrift:'CashFlowPosting'().
+make_test_cashflow() ->
+    ?cfpost(
+        {system, settlement},
+        {provider, settlement},
+        {product,
+            {min_of,
+                ?ordset([
+                    ?fixed(10, <<"RUB">>),
+                    ?share(5, 100, operation_amount, round_half_towards_zero)
+                ])}}
+    ).
 
 %% Other helpers
 

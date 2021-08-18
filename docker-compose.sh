@@ -10,7 +10,7 @@ services:
     working_dir: $PWD
     command: /sbin/init
     depends_on:
-      hellgate:
+      party-management:
         condition: service_healthy
 
   dominant:
@@ -18,22 +18,6 @@ services:
     command: /opt/dominant/bin/dominant foreground
     depends_on:
       machinegun:
-        condition: service_healthy
-    healthcheck:
-      test: "curl http://localhost:8022/"
-      interval: 5s
-      timeout: 1s
-      retries: 12
-
-  hellgate:
-    image: dr2.rbkmoney.com/rbkmoney/hellgate:82a6bc50749cb5801e648bca2f0ece94dcf1c26e
-    command: /opt/hellgate/bin/hellgate foreground
-    depends_on:
-      machinegun:
-        condition: service_healthy
-      dominant:
-        condition: service_healthy
-      shumway:
         condition: service_healthy
     healthcheck:
       test: "curl http://localhost:8022/"
@@ -78,4 +62,17 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - SERVICE_NAME=shumway-db
+
+  party-management:
+    image: dr2.rbkmoney.com/rbkmoney/party-management:935c91235f88f0669d7dc435be686d834a7d397f
+    command: /opt/party-management/bin/party-management foreground
+    depends_on:
+      - machinegun
+      - dominant
+      - shumway
+    healthcheck:
+      test: "curl http://localhost:8022/"
+      interval: 5s
+      timeout: 1s
+      retries: 20
 EOF
