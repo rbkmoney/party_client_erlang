@@ -19,6 +19,7 @@
 -export([get_contract/4]).
 -export([compute_contract_terms/8]).
 -export([get_shop/4]).
+-export([get_shop_contract/4]).
 -export([compute_shop_terms/7]).
 -export([compute_provider/5]).
 -export([compute_provider_terminal_terms/6]).
@@ -51,6 +52,7 @@
 -type contract() :: dmsl_domain_thrift:'Contract'().
 -type shop_id() :: dmsl_domain_thrift:'ShopID'().
 -type shop() :: dmsl_domain_thrift:'Shop'().
+-type shop_contract() :: dmsl_payment_processing_thrift:'ShopContract'().
 -type claim_id() :: dmsl_payment_processing_thrift:'ClaimID'().
 -type claim() :: dmsl_payment_processing_thrift:'Claim'().
 -type claim_revision() :: dmsl_payment_processing_thrift:'ClaimRevision'().
@@ -301,9 +303,15 @@ when
 compute_payout_cash_flow(PartyId, Params, Client, Context) ->
     call('ComputePayoutCashFlow', [PartyId, Params], Client, Context).
 
--spec get_shop(party_id(), shop_id(), client(), context()) -> result(shop(), Error) when Error :: shop_not_found().
+-spec get_shop(party_id(), shop_id(), client(), context()) -> result(shop(), Error) when
+    Error :: party_not_found() | shop_not_found().
 get_shop(PartyId, ShopId, Client, Context) ->
     call('GetShop', [PartyId, ShopId], Client, Context).
+
+-spec get_shop_contract(party_id(), shop_id(), client(), context()) -> result(shop_contract(), Error) when
+    Error :: party_not_found() | shop_not_found() | contract_not_found().
+get_shop_contract(PartyId, ShopId, Client, Context) ->
+    call('GetShopContract', [PartyId, ShopId], Client, Context).
 
 -spec block_shop(party_id(), shop_id(), block_reason(), client(), context()) -> void(Error) when
     Error :: shop_not_found() | invalid_shop_status().
