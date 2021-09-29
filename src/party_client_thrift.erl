@@ -35,11 +35,6 @@
 
 -export([get_claim/4]).
 -export([get_claims/3]).
--export([create_claim/4]).
--export([update_claim/6]).
--export([accept_claim/5]).
--export([deny_claim/6]).
--export([revoke_claim/6]).
 
 -export([get_account_state/4]).
 -export([get_shop_account/4]).
@@ -140,11 +135,7 @@
 -type contract_not_found() :: dmsl_payment_processing_thrift:'ContractNotFound'().
 -type shop_not_found() :: dmsl_payment_processing_thrift:'ShopNotFound'().
 -type invalid_shop_status() :: dmsl_payment_processing_thrift:'InvalidShopStatus'().
--type changeset_conflict() :: dmsl_payment_processing_thrift:'ChangesetConflict'().
--type invalid_changeset() :: dmsl_payment_processing_thrift:'InvalidChangeset'().
 -type claim_not_found() :: dmsl_payment_processing_thrift:'ClaimNotFound'().
--type invalid_claim_status() :: dmsl_payment_processing_thrift:'InvalidClaimStatus'().
--type invalid_claim_revision() :: dmsl_payment_processing_thrift:'InvalidClaimRevision'().
 -type shop_account_not_found() :: dmsl_payment_processing_thrift:'ShopAccountNotFound'().
 -type account_not_found() :: dmsl_payment_processing_thrift:'AccountNotFound'().
 -type payment_institution_not_found() :: dmsl_payment_processing_thrift:'PaymentInstitutionNotFound'().
@@ -348,38 +339,6 @@ get_claim(PartyId, ClaimId, Client, Context) ->
 -spec get_claims(party_id(), client(), context()) -> result([claim()]).
 get_claims(PartyId, Client, Context) ->
     call('GetClaims', [PartyId], Client, Context).
-
--spec create_claim(party_id(), changeset(), client(), context()) -> result(claim(), Error) when
-    Error :: invalid_party_status() | changeset_conflict() | invalid_changeset() | invalid_request().
-create_claim(PartyId, Changeset, Client, Context) ->
-    call('CreateClaim', [PartyId, Changeset], Client, Context).
-
--spec update_claim(party_id(), claim_id(), claim_revision(), changeset(), client(), context()) -> void(Error) when
-    Error ::
-        invalid_party_status()
-        | changeset_conflict()
-        | invalid_changeset()
-        | invalid_request()
-        | claim_not_found()
-        | invalid_claim_status()
-        | invalid_claim_revision().
-update_claim(PartyId, ClaimId, Revision, Changeset, Client, Context) ->
-    call('UpdateClaim', [PartyId, ClaimId, Revision, Changeset], Client, Context).
-
--spec accept_claim(party_id(), claim_id(), claim_revision(), client(), context()) -> void(Error) when
-    Error :: claim_not_found() | invalid_changeset() | invalid_claim_revision() | invalid_claim_status().
-accept_claim(PartyId, ClaimId, Revision, Client, Context) ->
-    call('AcceptClaim', [PartyId, ClaimId, Revision], Client, Context).
-
--spec deny_claim(party_id(), claim_id(), claim_revision(), deny_reason(), client(), context()) -> void(Error) when
-    Error :: claim_not_found() | invalid_claim_revision() | invalid_claim_status().
-deny_claim(PartyId, ClaimId, Revision, Reason, Client, Context) ->
-    call('DenyClaim', [PartyId, ClaimId, Revision, Reason], Client, Context).
-
--spec revoke_claim(party_id(), claim_id(), claim_revision(), revoke_reason(), client(), context()) -> void(Error) when
-    Error :: invalid_party_status() | claim_not_found() | invalid_claim_revision() | invalid_claim_status().
-revoke_claim(PartyId, ClaimId, Revision, Reason, Client, Context) ->
-    call('RevokeClaim', [PartyId, ClaimId, Revision, Reason], Client, Context).
 
 -spec get_account_state(party_id(), account_id(), client(), context()) -> result(account_state(), Error) when
     Error :: account_not_found().
