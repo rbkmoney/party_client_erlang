@@ -64,7 +64,7 @@ services:
       - SERVICE_NAME=shumway-db
 
   party-management:
-    image: dr2.rbkmoney.com/rbkmoney/party-management:935c91235f88f0669d7dc435be686d834a7d397f
+    image: dr2.rbkmoney.com/rbkmoney/party-management:63c7b92c75b14de758d94db7a7b14825339d2560
     command: /opt/party-management/bin/party-management foreground
     depends_on:
       - machinegun
