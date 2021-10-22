@@ -455,8 +455,6 @@ init_domain() ->
     ok = party_domain_fixtures:cleanup(),
     {ok, _} = dmt_client_cache:update(),
     ok = party_domain_fixtures:apply_domain_fixture(),
-    % Wait until hellgate dmt_client cache updating
-    timer:sleep(5000),
     {ok, _Revision} = dmt_client_cache:update().
 
 create_party(C) ->
