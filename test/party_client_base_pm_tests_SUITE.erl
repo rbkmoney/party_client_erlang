@@ -188,7 +188,7 @@ contract_create_and_get_test(C) ->
     Timestamp = genlib_rfc3339:format(genlib_time:unow() + 10, millisecond),
     {ok, DomainRevision} = dmt_client_cache:update(),
     {ok, PartyRevision} = party_client_thrift:get_revision(PartyId, Client, Context),
-    Varset = #payproc_Varset{},
+    Varset = #payproc_ComputeContractTermsVarset{},
     {ok, _Terms} = party_client_thrift:compute_contract_terms(
         PartyId,
         ContractId,
@@ -211,7 +211,7 @@ shop_create_and_get_test(C) ->
     Timestamp = genlib_rfc3339:format(genlib_time:unow() + 10, millisecond),
     {ok, PartyRevision} = party_client_thrift:get_revision(PartyId, Client, Context),
     PartyRevisionParam = {revision, PartyRevision},
-    Varset = #payproc_Varset{},
+    Varset = #payproc_ComputeShopTermsVarset{},
     {ok, _Terms} =
         party_client_thrift:compute_shop_terms(PartyId, ShopId, Timestamp, PartyRevisionParam, Varset, Client, Context).
 
