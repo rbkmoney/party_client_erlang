@@ -82,6 +82,8 @@
 -type payment_institution() :: dmsl_domain_thrift:'PaymentInstitution'().
 -type payment_institution_ref() :: dmsl_domain_thrift:'PaymentInstitutionRef'().
 -type varset() :: dmsl_payment_processing_thrift:'Varset'().
+-type contract_terms_varset() :: dmsl_payment_processing_thrift:'ComputeContractTermsVarset'().
+-type shop_terms_varset() :: dmsl_payment_processing_thrift:'ComputeShopTermsVarset'().
 -type terms() :: dmsl_domain_thrift:'TermSet'().
 -type domain_revision() :: dmsl_domain_thrift:'DataRevision'().
 -type final_cash_flow() :: dmsl_domain_thrift:'FinalCashFlow'().
@@ -250,7 +252,7 @@ when
     TS :: timestamp(),
     Revision :: party_revision_param(),
     Domain :: domain_revision(),
-    VS :: varset(),
+    VS :: contract_terms_varset(),
     Error :: party_not_exists_yet() | contract_not_found().
 compute_contract_terms(PartyId, ContractId, Timestamp, PartyRevision, DomainRevision, Varset, Client, Context) ->
     Args = [PartyId, ContractId, Timestamp, PartyRevision, DomainRevision, Varset],
@@ -342,9 +344,15 @@ suspend_shop(PartyId, ShopId, Client, Context) ->
 activate_shop(PartyId, ShopId, Client, Context) ->
     call('ActivateShop', [PartyId, ShopId], Client, Context).
 
--spec compute_shop_terms(party_id(), shop_id(), timestamp(), party_revision_param(), varset(), client(), context()) ->
-    result(terms(), Error)
-when
+-spec compute_shop_terms(
+    party_id(),
+    shop_id(),
+    timestamp(),
+    party_revision_param(),
+    shop_terms_varset(),
+    client(),
+    context()
+) -> result(terms(), Error) when
     Error :: shop_not_found() | invalid_shop_status() | party_not_exists_yet().
 compute_shop_terms(PartyId, ShopId, Timestamp, PartyRevision, Varset, Client, Context) ->
     call('ComputeShopTerms', [PartyId, ShopId, Timestamp, PartyRevision, Varset], Client, Context).
